@@ -5,10 +5,10 @@ const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 1080;
 const ASPECT_RATIO = BASE_WIDTH / BASE_HEIGHT;
 
-export const gameConfig = {
-    
+export const gameConfig = {   
   type: Phaser.AUTO,
   scene: [Background],
+  antialias: true,
   scale: {
     scaleFactor: 1,
     minScaleFactor: 1,

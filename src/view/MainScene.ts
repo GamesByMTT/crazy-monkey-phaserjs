@@ -60,7 +60,26 @@ export default class MainScene extends Scene {
 
         // Initialize LineSymbols
         this.lineSymbols = new LineSymbols(this, 10, 12, this.lineGenerator)
-        this.mainContainer.add(this.lineSymbols)
+        
+        this.mainContainer.add(this.lineSymbols);
+        const frames = [];
+        for (let i = 0; i <= 39; i++) {
+            frames.push({ key: `monkeyanim${i}` }); // Use the same key names as loaded in preload
+          }
+      
+          // Create an animation using frame objects
+          this.anims.create({
+            key: 'monkeySwing',   // Key for the animation
+            frames: frames,       // Frames array
+            frameRate: 25,        // Animation speed
+            repeat: -1            // Repeat indefinitely
+          });
+      
+          // Add a sprite to play the animation
+          const monkeySprite = this.add.sprite(gameConfig.scale.width/2 + 680, 350, 'monkeyanim0');
+          
+          // Play the animation on the sprite
+          monkeySprite.play('monkeySwing');
     }
 
     update(time: number, delta: number) {
@@ -163,12 +182,16 @@ export default class MainScene extends Scene {
             pointer.event.stopPropagation();
         });
 
+        const winBg = this.add.sprite(gameConfig.scale.width/2, gameConfig.scale.height/2, "winningBg").setDepth(11).setOrigin(0.5)
 
         // Create the sprite based on the key provided
-        const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY - 50, spriteKey).setDepth(11);
+        const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY - 50, spriteKey).setDepth(11).setScale(0.8);
+        const winAmountPanel = this.add.sprite(gameConfig.scale.width/2, gameConfig.scale.height/2 + 300, "winAmountPanel").setDepth(11).setScale(0.4)
+        // winAmountPanel.setPosition()
+        winAmountPanel.setOrigin(0.5)
 
         // Create the text object to display win amount
-        const winText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, '0', {
+        const winText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 300, '0', {
             font: '45px',
             color: '#FFFFFF'
         }).setDepth(11).setOrigin(0.5);
@@ -186,6 +209,8 @@ export default class MainScene extends Scene {
                 // Automatically close the popup after a few seconds
                 this.time.delayedCall(4000, () => {
                     inputOverlay.destroy();
+                    winBg.destroy();
+                    winAmountPanel.destroy();
                     winText.destroy();
                     winSprite.destroy();
                 });
@@ -238,7 +263,7 @@ export default class MainScene extends Scene {
                     freeText.destroy();
                     winSprite.destroy();
                     startButton.destroy();
-                    Globals.Socket?.sendMessage("SPIN", { currentBet: currentGameData.currentBetIndex, currentLines: 20, spins: 1 });
+                    Globals.Socket?.sendMessage("SPIN", { currentBet: currentGameData.currentBetIndex, currentLines: 9, spins: 1 });
                     currentGameData.currentBalance -= initData.gameData.Bets[currentGameData.currentBetIndex];
                     // this.currentBalanceText.updateLabelText(currentGameData.currentBalance.toFixed(2));
                     this.onSpinCallBack();

@@ -30,13 +30,13 @@ export class Slots extends Phaser.GameObjects.Container {
         this.slotMask = new Phaser.GameObjects.Graphics(scene);
         
         this.maskWidth = gameConfig.scale.width;
-        this.maskHeight = 600;
+        this.maskHeight = 640;
         // this.slotMask.fillStyle(0xffffff, 1);
         this.slotMask.fillRoundedRect(0, 0, this.maskWidth, this.maskHeight, 20);
         // mask Position set
         this.slotMask.setPosition(
             gameConfig.scale.width / 5,
-            gameConfig.scale.height / 5
+            gameConfig.scale.height / 6
         );
         // this.add(this.slotMask);
         // Filter and pick symbol keys based on the criteria
@@ -45,12 +45,12 @@ export class Slots extends Phaser.GameObjects.Container {
         // Assume all symbols have the same width and height
         const exampleSymbol = new Phaser.GameObjects.Sprite(scene, 0, 0, this.getRandomSymbolKey());
         this.symbolWidth = exampleSymbol.displayWidth/ 5;
-        this.symbolHeight = exampleSymbol.displayHeight/4.6;
-        this.spacingX = this.symbolWidth * 5.7; // Add some spacing
+        this.symbolHeight = exampleSymbol.displayHeight/5;
+        this.spacingX = this.symbolWidth * 6; // Add some spacing
         this.spacingY = this.symbolHeight * 5.7; // Add some spacing
         const startPos = {
             x: gameConfig.scale.width /3.45,
-            y: gameConfig.scale.height /3.5    
+            y: gameConfig.scale.height / 3.5    
         };
         for (let i = 0; i < 5; i++) { // 5 columns
             const reelContainer = new Phaser.GameObjects.Container(scene);

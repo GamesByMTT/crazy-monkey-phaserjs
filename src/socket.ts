@@ -32,7 +32,7 @@ export class SocketManager {
    this.socket = io(this.SocketUrl, {
       auth: {
         token: this.authToken,
-        gameId: "SL-CM",
+        gameId: "SL-CRM",
       },
       reconnectionAttempts: 5,
       reconnectionDelay: 1000, // Initial delay between reconnection attempts (in ms)
