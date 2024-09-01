@@ -78,6 +78,7 @@ export const LoaderConfig = {
     soundIndicator: "src/sprites/Indicator.png",
     winningBg: "src/sprites/winningBg.png",
     winAmountPanel: "src/sprites/amountPanel.png",
+    indicatorSprite: "src/sprites/SliderButton.png",
 
     left0: "src/sprites/Colorfulleft1.png",
     left1: "src/sprites/Colorfulleft2.png",
@@ -119,6 +120,7 @@ export const LoaderConfig = {
     rightHover6: "src/sprites/Blackright7.png",
     rightHover7: "src/sprites/Blackright8.png",
     rightHover8: "src/sprites/Blackright9.png",
+
 
     line0: "src/sprites/line1.png",
     line1: "src/sprites/line2.png",

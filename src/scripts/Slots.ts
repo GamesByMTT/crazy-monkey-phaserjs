@@ -171,17 +171,22 @@ export class Slots extends Phaser.GameObjects.Container {
             for (let i = 0; i < this.slotSymbols.length; i++) {
                 for (let j = 0; j < this.slotSymbols[i].length; j++) {
                     this.slotSymbols[i][j].update(delta);
+    
                     // Check if the symbol is out of bounds (off the bottom)
                     if (this.slotSymbols[i][j].symbol.y >= this.slotMask.y + this.maskHeight) {
                         // Reposition the symbol to the top of the reel
-                        const lastSymbolIndex = this.slotSymbols[i].length - 1;
-                        const newY = this.slotSymbols[i][0].symbol.y - this.symbolHeight * 4; // Adjust to space out symbols correctly
-                        // this.slotSymbols[i][j].symbol.y = newY;
+                        const newY = this.slotSymbols[i][0].symbol.y - this.symbolHeight * 6; 
+                        this.slotSymbols[i][j].symbol.y = newY;
+                        
+                        // Optionally, change the texture or animation for the new cycle
+                        const newSymbolKey = this.getRandomSymbolKey();
+                        this.slotSymbols[i][j].symbol.setTexture(newSymbolKey);
                     }
                 }
             }
         }
     }
+    
     // winMusic
     winMusic(key: string){
         // this.SoundManager.playSound(key)
@@ -279,8 +284,8 @@ class Symbols {
       update(dt: number) {
         
         if (this.startMoving) {
-          const deltaY = 2 * dt; 
-          const newY = this.symbol.y + deltaY;  
+          const deltaY = 0.8 * dt; 
+          const newY = this.symbol.y + deltaY * 2;  
           this.symbol.y = newY;         
         // Check if newY exceeds the maximum value
         if (newY >= (this.isMobile ? window.innerHeight * 2 : window.innerHeight * 1.2)) {

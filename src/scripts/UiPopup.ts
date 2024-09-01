@@ -145,10 +145,24 @@ export class UiPopups extends Phaser.GameObjects.Container {
         const musicImage = this.scene.add.image(-450, 80, 'musicImage').setDepth(10).setScale(0.7);
         const soundProgreesBar = this.scene.add.image(40, -100, 'sounProgress')
         const musicProgreesBar = this.scene.add.image(40,100, 'sounProgress')
-        const sounPlus = this.scene.add.image(420, 40, 'soundPlus')
-        const soundMinus = this.scene.add.image(-330, 40, 'soundMinus')
-        const sounPlusOne = this.scene.add.image(420, -160, 'soundPlus')
-        const soundMinusOne = this.scene.add.image(-330, -160, 'soundMinus')
+        const sounPlus = this.scene.add.image(420, 40, 'soundPlus').setInteractive()
+        const soundMinus = this.scene.add.image(-330, 40, 'soundMinus').setInteractive()
+        const sounPlusOne = this.scene.add.image(420, -160, 'soundPlus').setInteractive()
+        const soundMinusOne = this.scene.add.image(-330, -160, 'soundMinus').setInteractive()
+
+        // New sprite for sound level indicator
+        const soundLevelIndicator = this.scene.add.image(40, -100, 'indicatorSprite').setDepth(11).setInteractive();
+        const musicLevelIndicator = this.scene.add.image(40, 100, 'indicatorSprite').setDepth(11).setInteractive();
+
+        // Configure initial positions based on current sound levels
+        let soundLevel = 0.5; // Example: start at 50%
+        let musicLevel = 0.5; // Example: start at 50%
+
+        // Set initial position of indicators
+        soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel - soundProgreesBar.width / 2);
+        musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel - musicProgreesBar.width / 2);
+
+
 
 
         const toggleBarSprite = [
@@ -172,10 +186,53 @@ export class UiPopups extends Phaser.GameObjects.Container {
         popupBg.setOrigin(0.5);
         popupBg.setScale(0.9)
         popupBg.setAlpha(1); // Set background transparency
+        infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage, soundProgreesBar, musicProgreesBar, sounPlusOne, soundMinusOne, sounPlus, soundMinus, soundLevelIndicator, musicLevelIndicator]);
+         // Add interactivity to plus and minus buttons for sound
+        sounPlus.on('pointerdown', () => {
+            if (soundLevel < 1) {
+                soundLevel += 0.1; // Increase sound level
+                this.adjustSoundVolume(soundLevel); // Adjust sound volume function
+                musicLevelIndicator.x = musicProgreesBar.x + ((musicProgreesBar.width * soundLevel) - musicProgreesBar.width / 1.5);
+            }
+        });
 
-        infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage, soundProgreesBar, musicProgreesBar, sounPlusOne, soundMinusOne, sounPlus, soundMinus]);
+        soundMinus.on('pointerdown', () => {
+            if (soundLevel > 0) {
+                soundLevel -= 0.1; // Decrease sound level
+                this.adjustSoundVolume(soundLevel); // Adjust sound volume function
+                musicLevelIndicator.x = musicProgreesBar.x + ((musicProgreesBar.width * soundLevel) - musicProgreesBar.width / 2.5);
+            }
+        });
+
+        // Add interactivity to plus and minus buttons for music
+        sounPlusOne.on('pointerdown', () => {
+            if (musicLevel < 1) {
+                musicLevel += 0.1; // Increase music level
+                this.adjustMusicVolume(musicLevel); // Adjust music volume function
+                soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 2);
+            }
+        });
+
+        soundMinusOne.on('pointerdown', () => {
+            if (musicLevel > 0) {
+                musicLevel -= 0.1; // Decrease music level
+                this.adjustMusicVolume(musicLevel); // Adjust music volume function
+                soundLevelIndicator.x = musicProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 2);
+            }
+        });
+}
+
+    // Function to adjust sound volume
+    adjustSoundVolume(level:number) {
+        // Implement sound volume adjustment logic here
+        this.scene.sound.volume = level; // Example using Phaser sound manager
     }
 
+    // Function to adjust music volume
+    adjustMusicVolume(level: number) {
+        // Implement music volume adjustment logic here
+        this.scene.sound.volume = level; // Example using Phaser sound manager
+    }
     
     buttonMusic(key: string){
         // this.SoundManager.playSound(key)

@@ -84,6 +84,7 @@ export default class MainScene extends Scene {
 
     update(time: number, delta: number) {
         this.slot.update(time, delta);
+        this.uiContainer.update()
     }
 
     /**

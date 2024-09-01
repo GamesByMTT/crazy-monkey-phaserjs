@@ -410,4 +410,14 @@ export class UiContainer extends Phaser.GameObjects.Container {
     bnuttonMusic(key: string){
         // this.SoundManager.playSound(key)
     }
+    update() {
+        // Check the value of this.currentWiningText.text
+        if (parseFloat(this.currentWiningText.text) > 0) {
+            this.doubleButton.alpha = 1;
+            this.doubleButton.disableInteractive();
+        } else {
+            this.doubleButton.alpha = 0.5;
+            this.doubleButton.setInteractive();
+        }
+    }
 }
