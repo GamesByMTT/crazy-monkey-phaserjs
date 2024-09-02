@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { Globals, ResultData, initData } from "./scripts/Globals";
+import { Globals, ResultData, initData, gambleData, gambleResult } from "./scripts/Globals";
 import MainLoader from "./view/MainLoader";
 let counter = 0
 
@@ -48,11 +48,11 @@ export class SocketManager {
 
     this.socket.on("connect", () => {
       console.log("Connected to the server");
-
-
       this.socket.on("message", (message : any) => {
         const data = JSON.parse(message);
         // console.log(`Message ID : ${data.id} |||||| Message Data : ${JSON.stringify(data.message)}`);
+        console.log("Message ID", data);
+        
         if(data.id == "InitData" ) {
           console.log(counter, "Socket");
           if(initData.gameData.Bets.length != 0){
@@ -77,11 +77,34 @@ export class SocketManager {
               Globals.emitter?.Call("ResultData");
               console.log(ResultData);
         }
+        if(data.id="gambleInitData"){
+          gambleData.gambleCards = data.message
+        }
+        if(data.id = "gambleResultData"){
+          gambleResult.gamleResultData = data.message
+        }
       });
     });
 
     this.socket.on("internalError", (errorMessage: string) => {
       console.log(errorMessage);
+    });
+
+    this.socket.on("disconnect", (reason: string) => {
+      console.log("Disconnected from the server. Reason:", reason);
+      // You can add additional logic here to handle the disconnection
+      // For example, attempt to reconnect manually, alert the user, etc.
+    });
+    this.socket.on("reconnect_attempt", (attemptNumber: number) => {
+      console.log(`Reconnection attempt #${attemptNumber}`);
+    });
+  
+    this.socket.on("reconnect", (attemptNumber: number) => {
+      console.log(`Reconnected to the server on attempt #${attemptNumber}`);
+    });
+  
+    this.socket.on("reconnect_failed", () => {
+      console.error("Reconnection failed.");
     });
   }
   sendMessage(id : string, message: any) {

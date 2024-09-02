@@ -1,135 +1,133 @@
 import Phaser, { Scene } from "phaser";
-import { Globals, initData, ResultData } from "../scripts/Globals";
-import { gameConfig } from "../scripts/appconfig";
+import { Globals, ResultData } from "../scripts/Globals";
 import SoundManager from "../scripts/SoundManager";
-let values = initData.gameData.BonusData
-export default class BonusScene extends Scene{
-    public bonusContainer!: Phaser.GameObjects.Container
-   public spinContainer!: Phaser.GameObjects.Container;
-   SoundManager!: SoundManager
-   SceneBg!: Phaser.GameObjects.Sprite
-    columnLeft!: Phaser.GameObjects.Sprite
-    columnRight!: Phaser.GameObjects.Sprite
-    roofTop!: Phaser.GameObjects.Sprite
-    wheel!: Phaser.GameObjects.Sprite
-    Stair!: Phaser.GameObjects.Sprite
-    snow!: Phaser.GameObjects.Sprite
-    spinWheelBg!: Phaser.GameObjects.Sprite
-    spinCircle!: Phaser.GameObjects.Sprite
-    spinCenter!: Phaser.GameObjects.Sprite
-    startButton!: Phaser.GameObjects.Sprite
-    public canSpinBonus: boolean = true;
+
+export default class BonusScene extends Scene {
+    public bonusContainer!: Phaser.GameObjects.Container;
+    SoundManager!: SoundManager;
+    SceneBg!: Phaser.GameObjects.Sprite;
+    winBg!: Phaser.GameObjects.Sprite;
+    private spriteObjects: Phaser.GameObjects.Sprite[] = [];
+    private spriteNames: string[] = [];
+    private coconutObjects: Phaser.GameObjects.Sprite[] = [];
+    private coconutAnims: string[] = [];
+    private bonusResults: string[] = ['20', '40', '30', '50', '0']; // Array of values to show
+    private totalWinAmount: number = 0;
+    private winamountText!: Phaser.GameObjects.Text;
+
     constructor() {
         super({ key: 'BonusScene' });
-       
-        
     }
-    create(){
-        console.log(values, "values");
+
+    create() {
         const { width, height } = this.cameras.main;
         this.bonusContainer = this.add.container();
-        this.SceneBg = new Phaser.GameObjects.Sprite(this, width/2, height/2, 'Background').setDisplaySize(width, height)
-        this.Stair = new Phaser.GameObjects.Sprite(this, width/2, height/1.08, 'stairs').setDepth(0)
-        this.columnLeft = new Phaser.GameObjects.Sprite(this, width/4.3, height/2.2, 'column').setDepth(1)
-        this.columnRight = new Phaser.GameObjects.Sprite(this, width/1.31, height/2.2, 'column').setDepth(1)
-        this.roofTop = new Phaser.GameObjects.Sprite(this, width/2, height * 0.11, 'roof').setDepth(2)
-        this.snow = new Phaser.GameObjects.Sprite(this, width/2, height/2.4, 'snow').setScale(0.9, 1)
-        this.spinWheelBg = new Phaser.GameObjects.Sprite(this, width/2, height/2, 'wheelBg').setScale(0.9)
-        // Create the spin circle sprite
-        this.spinCircle = new Phaser.GameObjects.Sprite(this, 0, 0, 'spinCircle');
-         
-        // Create a container for the spin circle and numbers
-        this.spinContainer = this.add.container(width / 2, height / 2.2, [this.spinCircle]);
-     
-        // Set a circular mask for the container to match the spinCircle size
-        const maskShape = this.make.graphics({ x: 0, y: 0 });
-        maskShape.fillCircle(0, 0, this.spinCircle.width / 2);
-        const mask = maskShape.createGeometryMask();
-        this.spinContainer.setMask(mask);
-     
-        this.spinCenter = new Phaser.GameObjects.Sprite(this, width/2, height/2.2, 'spinCenter').setScale(0.7);
-        this.startButton = new Phaser.GameObjects.Sprite (this, width/2, height/1.15, 'freeSpinStartButton').setScale(0.7).setInteractive()
-        this.bonusContainer.add([ this.SceneBg, this.roofTop, this.snow, this.Stair,  this.startButton, this.columnLeft, this.columnRight, this.spinWheelBg, this.spinCircle, this.spinCenter]);
-        this.spinContainer = this.add.container(width / 2, height / 2.2, [this.spinCircle]);
-     
-       
-        let segments = initData.gameData.BonusData.length;
-        let anglePerSegment = 360 / segments;
-        console.log("anglePerSegment", anglePerSegment);
-        
-        for(let i=0; i< segments; i++){
-            let startAngle = Phaser.Math.DegToRad(i * anglePerSegment);
-            let endAngle = Phaser.Math.DegToRad((i + 1) * anglePerSegment);
-            // this.spinCircle.slice(0, 0, 200, startAngle, endAngle, false);
-            let text = this.add.text(0, 0, initData.gameData.BonusData[i], { font: "20px Arial", color: "#fff" });
-            text.setOrigin(0.5);
-            text.setPosition(
-                120 * Math.cos(startAngle + (endAngle - startAngle) / 2),
-                120 * Math.sin(startAngle + (endAngle - startAngle) / 2)
-            );
-            this.spinContainer.add(text);
-        }
-        this.spinContainer.angle = 0;
-        this.startButton.on("pointerdown", ()=>{
-            if (this.canSpinBonus) {
-                 if(ResultData.gameData.BonusStopIndex){
-                    this.startButton.setTexture("freeSpinStartButtonPressed")
-                    this.spinWheel(ResultData.gameData.BonusStopIndex);
-                 }
-                 //else{
-                    // this.spinWheel(1);
-                 // }
-                 // Pass the index you want the wheel to stop at
-            }
+        this.SceneBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 2, 'Background')
+            .setDisplaySize(width, height)
+            .setDepth(11)
+            .setInteractive();
+        this.SceneBg.on('pointerdown', (pointer:Phaser.Input.Pointer)=>{
+            pointer.event.stopPropagation();
         })
-      }
-      spinWheel(targetIndex: number) {
-        // const spinSound = Globals.soundResources["spinWheelMusic"];
-        // spinSound.rate(1);  // Ensure starting rate is 1 (normal speed)
-        // spinSound.play();
+        this.winBg = new Phaser.GameObjects.Sprite(this, width * 0.9, height / 2.1, "winBg");
         
-        this.canSpinBonus = false;
-        
-        let segments = initData.gameData.BonusData.length;
-        let anglePerSegment = 360 / segments; // 45 degrees for 8 segments
-        let desiredStopAngle = 247.5;  // Your desired stopping angle
-    
-        // Calculate the rotation needed to align targetIndex at the desired stop angle
-        let targetAngle = (desiredStopAngle - ((targetIndex * anglePerSegment) + (anglePerSegment / 2))) + 22.5;
-    
-        // Calculate random spins before landing on target
-        let randomSpins = Phaser.Math.Between(2, 5);
-        console.log(randomSpins, "randomSpins");
-        
-        let totalRotation = randomSpins * 360 + targetAngle;  // Total rotation including full spins
-        console.log(totalRotation, "totalRotation", targetAngle) ;
-        
-        // Spin the wheel
-        this.tweens.add({
-            targets: this.spinContainer,
-            angle: totalRotation,
-            ease: 'Back.easeOut',
-            duration: 5000,
-            onUpdate: (tween, target) => {
-                const progress = tween.progress;
-                // Gradually slow down the spin sound as the wheel slows down
-                // if (progress > 0.5) {
-                //     const newRate = 1 - ((progress - 0.7) * 2);  // Decrease rate to slow down
-                //     spinSound.rate(Phaser.Math.Clamp(newRate, 0.5, 1));  // Ensure rate doesn't go below 0.5
-                // }
-            },
-            onComplete: () => {
-                // spinSound.rate(0.5);
-                // spinSound.stop();
-    
-                this.startButton.setInteractive();
-                this.startButton.setTexture("freeSpinStartButton");
-                
-                setTimeout(() => {
-                    Globals.SceneHandler?.removeScene("BonusScene");
-                }, 2000);
+        // let winamount = this.add.text(width * 0.895, height / 2, ResultData.gameData.WinAmout.toString(), { font: "40px Arial", color: "#fff" });
+        this.winamountText = this.add.text(width * 0.9, height / 2, this.totalWinAmount.toString(), { font: "40px Arial", color: "#fff",  align: 'center',  }).setOrigin(0.5);
+        this.bonusContainer.add([this.SceneBg, this.winBg, this.winamountText]);
+
+        // Initialize sprite names and animations
+        for (let i = 0; i <= 29; i++) {
+            this.spriteNames.push(`Bail${i}`);
+        }
+        for (let j = 0; j <= 47; j++) {
+            this.coconutAnims.push(`coconutAnim${j}`);
+        }
+
+        // Define x positions for sprites
+        const xPositions: number[] = [500, 750, 1000, 1250, 1500]; // Adjust these values as needed
+
+        // Create coconut sprites and set up interactivity
+        xPositions.forEach((xPos: number, index: number) => {
+            const coconut = this.add.sprite(xPos, 400, "coconutButton").setInteractive();
+            coconut.setDepth(11);
+            coconut.setData('value', ResultData.gameData.BonusResult[index]); // Assign the value from the array
+            coconut.on('pointerdown', () => this.handleCoconutClick(coconut, xPos, 400)); // Add click handler
+            this.coconutObjects.push(coconut);
+            const sprite = this.add.sprite(xPos, 400, 'Bail0'); // Start with the first sprite
+            this.spriteObjects.push(sprite);
+        });
+
+        this.createTweenAnimation();
+    }
+
+    private createTweenAnimation(): void {
+        this.tweens.addCounter({
+            from: 0,
+            to: this.spriteNames.length - 1,
+            duration: 1500, // Duration for each frame change (adjust as needed)
+            repeat: -1, // Loop indefinitely
+            onUpdate: (tween: Phaser.Tweens.Tween) => {
+                const frameIndex = Math.floor(tween.getValue());
+                // Update the texture of each sprite with the corresponding frame
+                this.spriteObjects.forEach(sprite => {
+                    sprite.setTexture(this.spriteNames[frameIndex]);
+                });
             }
         });
     }
-    
+
+    private handleCoconutClick(coconut: Phaser.GameObjects.Sprite, x: number, y: number): void {
+        const valueText = coconut.getData('value');
+        const value = parseInt(coconut.getData('value'))
+        this.totalWinAmount += value;
+        // Remove the clicked coconut sprite
+        this.winamountText.setText(this.totalWinAmount.toString());
+        coconut.destroy();
+
+        const animSprite = this.add.sprite(x, y, this.coconutAnims[0]).setDepth(12); // Start with the first frame
+
+        // Track the last position for the text
+        let finalFramePosition = { x, y };
+
+        // Tween animation to cycle through frames
+        this.tweens.addCounter({
+            from: 0,
+            to: this.coconutAnims.length - 1,
+            duration: 1500, // Duration for each frame change (adjust as needed)
+            onUpdate: (tween: Phaser.Tweens.Tween) => {
+                const frameIndex = Math.floor(tween.getValue());
+                animSprite.setTexture(this.coconutAnims[frameIndex]);
+                // Update final frame position if needed
+                finalFramePosition = { x: animSprite.x, y: animSprite.y };
+            },
+            onComplete: () => {
+                // Display the text at the last frame's position
+                let text = this.add.text(finalFramePosition.x, finalFramePosition.y + 380, `+${valueText}`, { font: "50px Arial", color: "#fff" }).setOrigin(0.5)
+                if(value === 0){
+                    text.destroy();
+                    text = this.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", { font: "40px Arial", color: "#fff"}).setOrigin(0.5)
+                    setTimeout(() => {
+                        Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
+                    }, 2000);
+                }
+                this.tweens.add({
+                    targets: text,
+                    alpha: 0, // Fade out text
+                    duration: 1000,
+                    delay: 1000, // Wait for the animation to complete
+                    onComplete: () => {
+                        // if(text == "Game Over")
+                        text.destroy(); // Remove the text after animation completes
+                    }
+                });
+                // animSprite.destroy(); // Clean up after animation
+            }
+        });
+    }
+
+    spinWheel() {
+        setTimeout(() => {
+            Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
+        }, 2000);
+    }
 }

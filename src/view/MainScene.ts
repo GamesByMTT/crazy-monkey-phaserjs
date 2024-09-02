@@ -36,7 +36,7 @@ export default class MainScene extends Scene {
         this.soundManager = new SoundManager(this)
 
         // Set up the stairs frame
-        this.gameBg = new Phaser.GameObjects.Sprite(this, width/2, height/2, 'gameBg')
+        this.gameBg = new Phaser.GameObjects.Sprite(this, width/2, height/2, 'gameBg').setDepth(0)
         this.reelBg = new Phaser.GameObjects.Sprite(this, width/2, height/2.2, 'reelBg').setDepth(0)
        
         
@@ -85,6 +85,7 @@ export default class MainScene extends Scene {
     update(time: number, delta: number) {
         this.slot.update(time, delta);
         this.uiContainer.update()
+        // this.uiContainer.doubleBtnInit()
     }
 
     /**
@@ -117,7 +118,7 @@ export default class MainScene extends Scene {
     recievedMessage(msgType: string, msgParams: any) {
         if (msgType === 'ResultData') {
             this.time.delayedCall(1000, () => {    
-                if (ResultData.gameData.BonusStopIndex > -1) {
+                if (ResultData.gameData.isBonus) {
                     setTimeout(() => {
                         Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
                     }, 2000);

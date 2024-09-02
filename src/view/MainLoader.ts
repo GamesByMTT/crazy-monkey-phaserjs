@@ -6,6 +6,7 @@ import { LoaderConfig, LoaderSoundConfig } from "../scripts/LoaderConfig";
 import { Globals } from "../scripts/Globals";
 import SoundManager from "../scripts/SoundManager";
 import { Howl } from "howler";
+import GambleScene from "./GambleScene";
 
 export default class MainLoader extends Scene {
     resources: any;
@@ -112,7 +113,6 @@ export default class MainLoader extends Scene {
         //     });
         // });
     }
-
     public loadScene() {
         this.completeLoading();
             Globals.SceneHandler?.removeScene('Background')

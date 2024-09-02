@@ -159,11 +159,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
         let musicLevel = 0.5; // Example: start at 50%
 
         // Set initial position of indicators
-        soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel - soundProgreesBar.width / 2);
-        musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel - musicProgreesBar.width / 2);
-
-
-
+        soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel - soundProgreesBar.width / 1.5);
+        musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel - musicProgreesBar.width / 2.5);
 
         const toggleBarSprite = [
             this.scene.textures.get('toggleBar'),
@@ -209,7 +206,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
             if (musicLevel < 1) {
                 musicLevel += 0.1; // Increase music level
                 this.adjustMusicVolume(musicLevel); // Adjust music volume function
-                soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 2);
+                soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 1.5);
             }
         });
 
@@ -217,7 +214,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
             if (musicLevel > 0) {
                 musicLevel -= 0.1; // Decrease music level
                 this.adjustMusicVolume(musicLevel); // Adjust music volume function
-                soundLevelIndicator.x = musicProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 2);
+                soundLevelIndicator.x = musicProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 2.5);
             }
         });
 }

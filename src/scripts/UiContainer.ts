@@ -5,6 +5,7 @@ import { TextLabel } from './TextLabel';
 import { gameConfig } from './appconfig';
 import MainScene from '../view/MainScene';
 import SoundManager from './SoundManager';
+import GambleScene from '../view/GambleScene';
 // Define UiContainer as a Phaser Scene class
 export class UiContainer extends Phaser.GameObjects.Container {
     SoundManager: SoundManager
@@ -217,16 +218,15 @@ export class UiContainer extends Phaser.GameObjects.Container {
     doubleBtnInit(){
         const textValue = this.currentWiningText.text; // Replace `getText()` with the actual method or property you use to get the text
         const numericValue = parseFloat(textValue);
+      
         if(numericValue > 0){
             this.doubleButton.setAlpha(1)
             this.doubleButton.setInteractive()
-            this.doubleButton = this.createButton('doubleButton', gameConfig.scale.width/2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9 , ()=>{
-
-            })
+           
         }else{
-            this.doubleButton = this.scene.add.sprite(gameConfig.scale.width/2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9 , 'doubleButton');
-            this.doubleButton.disableInteractive();
-            this.doubleButton.setAlpha(0.5)
+                this.doubleButton = this.scene.add.sprite(gameConfig.scale.width/2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9 , 'doubleButton');
+                this.doubleButton.disableInteractive();
+                this.doubleButton.setAlpha(0.5)
         }
     }
 
@@ -414,10 +414,15 @@ export class UiContainer extends Phaser.GameObjects.Container {
         // Check the value of this.currentWiningText.text
         if (parseFloat(this.currentWiningText.text) > 0) {
             this.doubleButton.alpha = 1;
-            this.doubleButton.disableInteractive();
+            this.doubleButton.setInteractive();
+            this.doubleButton = this.createButton('doubleButton', gameConfig.scale.width/2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9 , ()=>{
+                // {"data":{"GAMBLETYPE":"HIGHCARD"},"id":"GambleInit"}
+                Globals.Socket?.sendMessage("GambleInit", {id: "GambleInit", GAMBLETYPE: "HIGHCARD"});
+                Globals.SceneHandler?.addScene('GambleScene', GambleScene, true)
+            })
         } else {
             this.doubleButton.alpha = 0.5;
-            this.doubleButton.setInteractive();
+            this.doubleButton.disableInteractive();
         }
     }
 }

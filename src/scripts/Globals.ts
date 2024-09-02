@@ -30,7 +30,7 @@ export const Globals: globalDataType = {
   fpsStats: new Stats(),
   Socket: undefined,
   soundResources: {},
-  PhaserInstance: undefined
+  PhaserInstance: undefined,
 };
 
 
@@ -87,6 +87,21 @@ export const ResultData = {
     currentBet : 0,
   },
 };
+export const gambleData = {
+  gambleCards:{
+    exCards: [], // To store an array of card objects
+    highCard: {}, // To store the high card object
+    lowCard: {},
+  }
+}
+
+export const gambleResult = {
+  gamleResultData:{
+    Balance: 0,
+    currentWining: 0,
+    playerWon: false
+  }
+}
 export const TextStyle = {
   dropShadow: true,
   dropShadowAngle: 1.8,
