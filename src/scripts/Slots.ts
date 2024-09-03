@@ -240,7 +240,7 @@ class Symbols {
                         this.scene.anims.create({
                             key: `symbol_anim_${elementId}`,
                             frames: textureKeys.map(key => ({ key })),
-                            frameRate: 15,
+                            frameRate: 20,
                             repeat: -1
                         });
                     // Set the texture to the first key and start the animation
