@@ -4,6 +4,7 @@ import { gameConfig } from "./appconfig";
 import { TextLabel } from "./TextLabel";
 import { UiContainer } from "./UiContainer";
 import SoundManager from "./SoundManager";
+import InfoScene from "./infoPopup";
 
 const Random = Phaser.Math.Between;
 let musiclevel = 0;
@@ -61,7 +62,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
         ];
         this.menuBtn = new InteractiveBtn(this.scene, menuBtnTextures, () => {
             this.buttonMusic("buttonpressed")
-            // this.openPopUp();
+            this.openPopUp();
         }, 0, true);
         this.menuBtn.setPosition( gameConfig.scale.width - this.menuBtn.width * 2,  this.menuBtn.height)
         this.add(this.menuBtn);
@@ -113,14 +114,15 @@ export class UiPopups extends Phaser.GameObjects.Container {
     }
 
     openPopUp() {
-        if (this.pageViewContainer) {
-            // Set background opacity to semi-transparent and show popup
-            this.popupBackground.setAlpha(1); // Make background semi-transparent
-            this.pageViewContainer.setVisible(true); // Show the PageView container
-            this.currentPageIndex = 0;
-            this.updatePageView();
-        } else {
-        }
+        Globals.SceneHandler?.addScene("InfoScene", InfoScene, true)
+        // if (this.pageViewContainer) {
+        //     // Set background opacity to semi-transparent and show popup
+        //     this.popupBackground.setAlpha(1); // Make background semi-transparent
+        //     this.pageViewContainer.setVisible(true); // Show the PageView container
+        //     this.currentPageIndex = 0;
+        //     this.updatePageView();
+        // } else {
+        // }
     }
     closePopUp() {
         // Reset visibility and background opacity when closing popup
