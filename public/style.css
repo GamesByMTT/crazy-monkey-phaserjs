@@ -17,11 +17,11 @@ body {
     background-image: cover;
     background-repeat: no-repeat;
 }
-@font-face {
+/* @font-face {
     font-family: 'MyCustomFont';
     src: url('./src/fonts/Poplar Regular.ttf') format('truetype');
   }
   
   body {
     font-family: 'Poplar', sans-serif;
-  }
+  } */
