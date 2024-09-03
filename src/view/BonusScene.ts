@@ -4,7 +4,7 @@ import SoundManager from "../scripts/SoundManager";
 
 export default class BonusScene extends Scene {
     public bonusContainer!: Phaser.GameObjects.Container;
-    SoundManager!: SoundManager;
+    SoundManager!: SoundManager;  // Declare the type
     SceneBg!: Phaser.GameObjects.Sprite;
     winBg!: Phaser.GameObjects.Sprite;
     private spriteObjects: Phaser.GameObjects.Sprite[] = [];
@@ -17,11 +17,14 @@ export default class BonusScene extends Scene {
 
     constructor() {
         super({ key: 'BonusScene' });
+        this.SoundManager = new SoundManager(this); 
     }
 
     create() {
+        
         const { width, height } = this.cameras.main;
         this.bonusContainer = this.add.container();
+        this.SoundManager.playSound("bonusBg");
         this.SceneBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 2, 'Background')
             .setDisplaySize(width, height)
             .setDepth(11)
@@ -88,7 +91,7 @@ export default class BonusScene extends Scene {
 
         // Track the last position for the text
         let finalFramePosition = { x, y };
-
+        this.SoundManager.playSound("coconutFall");
         // Tween animation to cycle through frames
         this.tweens.addCounter({
             from: 0,
@@ -106,9 +109,12 @@ export default class BonusScene extends Scene {
                 if(value === 0){
                     text.destroy();
                     text = this.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", { font: "40px Arial", color: "#fff"}).setOrigin(0.5)
-                    setTimeout(() => {
+                    setTimeout(() => { 
+                        this.SoundManager.pauseSound("bonusBg")
                         Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
                     }, 2000);
+                }else{
+                    this.SoundManager.playSound("bonuswin");
                 }
                 this.tweens.add({
                     targets: text,

@@ -167,7 +167,7 @@ export class Slots extends Phaser.GameObjects.Container {
     
     // winMusic
     winMusic(key: string){
-        // this.SoundManager.playSound(key)
+        this.SoundManager.playSound(key)
     }
     
 }
@@ -214,7 +214,7 @@ class Symbols {
         }
     }
     playAnimation(animationId: any) {
-        console.log(animationId, "playanimation");
+        // console.log(animationId, "playanimation");
         
         this.symbol.play(animationId)
     }
@@ -240,7 +240,7 @@ class Symbols {
                         this.scene.anims.create({
                             key: `symbol_anim_${elementId}`,
                             frames: textureKeys.map(key => ({ key })),
-                            frameRate: 20,
+                            frameRate: 15,
                             repeat: -1
                         });
                     // Set the texture to the first key and start the animation

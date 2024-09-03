@@ -41,16 +41,18 @@ module.exports = {
         use: ["style-loader", "css-loader"],
       },
       {
-        test: /\.ttf$/,
+        test: /\.(ttf|eot|woff|woff2)$/,
         use: [
           {
-            loader: 'ttf-loader',
+            loader: 'file-loader',
             options: {
-              name: './fonts/[hash].[ext]',
+              name: '[name].[ext]',
+              outputPath: 'fonts/',
+              publicPath: 'fonts/',
             },
-          }
-        ]
-      }
+          },
+        ],
+      },
     ]
   },
   resolve: {

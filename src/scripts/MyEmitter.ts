@@ -9,7 +9,6 @@ export default class MyEmitter {
     Call(msgType: string, msgParams = {}) {
         if (msgType != "timer" && msgType != "turnTimer"){
             Globals.SceneHandler?.recievedMessage(msgType, msgParams)
-            
         }
     }
 }

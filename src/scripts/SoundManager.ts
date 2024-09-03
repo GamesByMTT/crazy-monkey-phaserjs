@@ -16,19 +16,17 @@ export default class SoundManager {
 
     public addSound(key: string, url: string) {
         if (this.scene.sound.get(key)) {
-            console.log('Sound already exists in cache');
             this.sounds[key] = this.scene.sound.get(key);
         } else {
-            console.log('Loading new sounds');
             this.sounds[key] = this.scene.sound.add(key, { volume: 0.5 });
         }
-        console.log(this.sounds[key], "test");
+        // console.log(this.sounds[key], "test");
         
     }
 
     public playSound(key: string) {
         if(this.soundEnabled){
-            if (key === 'backgroundMusic') {                
+            if (key === 'backgroundMusic' || key ==="bonusBg") {                
                 Globals.soundResources[key].loop(true);
                 Globals.soundResources[key].play();
             } else {
@@ -39,11 +37,11 @@ export default class SoundManager {
     }
 
     public pauseSound(key: string) {
-        // Globals.soundResources[key].pause();
+        Globals.soundResources[key].stop();
     }
 
     public resumeBgMusic(key: string){
-        // Globals.soundResources[key].play()
+        Globals.soundResources[key].play()
     }
 
     public stopSound(key: string) {
@@ -52,30 +50,49 @@ export default class SoundManager {
         }
     }
 
-    public setSoundEnabled(enabled: boolean) {
-        this.soundEnabled = enabled;
-        if (!enabled) {
-            // Stop all sounds when sounds is disabled
-            Object.values(this.sounds).forEach(sounds => sounds.stop());
-        }
+public setSoundEnabled(enabled: boolean) {
+    this.soundEnabled = enabled;
+    if (!enabled) {
+        // Stop all sounds when sounds is disabled
+        Object.values(this.sounds).forEach(sounds => sounds.stop());
     }
+}
 
-    public setMusicEnabled(enabled: boolean) {
-        this.musicEnabled = enabled;
+public setMusicEnabled(enabled: boolean) {
+    this.musicEnabled = enabled;
         // Additional logic for handling music
-        if (!enabled) {
-           this.stopSound("backgroundMusic")
-        }else{
-            this.playSound("backgroundMusic")
-        }
+    if (!enabled) {
+        this.stopSound("backgroundMusic")
+    }else{
+        this.playSound("backgroundMusic")
     }
+}
 
-    public getSound(key: string): Phaser.Sound.BaseSound | undefined {
-        return this.sounds[key];
+ // Function to adjust volume level of a playing sound using Globals.soundResources
+ public setVolume(key: string, volume: number) {
+    const sound = Globals.soundResources[key];
+    if (sound) {
+        // Ensure volume is between 0 and 1
+        const clampedVolume = Phaser.Math.Clamp(volume, 0, 1);
+        if (sound instanceof Phaser.Sound.WebAudioSound || sound instanceof Phaser.Sound.HTML5AudioSound) {
+            // console.log("bfgbbfgbb");
+            
+            sound.setVolume(clampedVolume);  // Correctly set the volume using setVolume method
+        } else {
+            // console.warn(`Sound ${key} does not support setVolume.`);
+        }
+        // console.log(`Volume for ${key} set to ${clampedVolume}`);
+    } else {
+        // console.warn(`Sound ${key} not found in Globals.soundResources.`);
     }
-    private setupFocusBlurEvents() {
-        window.addEventListener('blur', () => {
-            console.log("onBlur");
+}
+
+public getSound(key: string): Phaser.Sound.BaseSound | undefined {
+    return this.sounds[key];
+}
+private setupFocusBlurEvents() {
+    window.addEventListener('blur', () => {
+            // console.log("onBlur");
                 this.pauseSound('backgroundMusic');
         });
 

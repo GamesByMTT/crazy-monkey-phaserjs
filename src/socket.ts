@@ -54,10 +54,8 @@ export class SocketManager {
         console.log("Message ID", data);
         
         if(data.id == "InitData" ) {
-          console.log(counter, "Socket");
           if(initData.gameData.Bets.length != 0){
-
-            
+            initData.UIData.symbols = data.message.UIData.payLines.symbol
           }
           else{
             initData.gameData = data.message.GameData;
@@ -77,11 +75,17 @@ export class SocketManager {
               Globals.emitter?.Call("ResultData");
               console.log(ResultData);
         }
-        if(data.id="gambleInitData"){
+        if(data.id == "gambleInitData"){
           gambleData.gambleCards = data.message
         }
-        if(data.id = "gambleResultData"){
+        if(data.id == "gambleResultData"){
           gambleResult.gamleResultData = data.message
+        
+        }
+        if(data.id == "GambleResult"){
+          gambleResult.gamleResultData = data.message
+          ResultData.playerData = data.message
+          Globals.emitter?.Call("GambleResult");
         }
       });
     });
@@ -108,7 +112,7 @@ export class SocketManager {
     });
   }
   sendMessage(id : string, message: any) {
-    console.log(message, "sending message");
+    // console.log(message, "sending message");
     this.socket.emit(
       "message",
       JSON.stringify({ id: id, data: message })

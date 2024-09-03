@@ -4,7 +4,7 @@ import { UiContainer } from '../scripts/UiContainer';
 import { LineGenerator, Lines } from '../scripts/Lines';
 import { UiPopups } from '../scripts/UiPopup';
 import LineSymbols from '../scripts/LineSymbols';
-import { Globals, ResultData, currentGameData, initData } from '../scripts/Globals';
+import { Globals, ResultData, currentGameData, initData, gambleResult } from '../scripts/Globals';
 import { gameConfig } from '../scripts/appconfig';
 import BonusScene from './BonusScene';
 import SoundManager from '../scripts/SoundManager';
@@ -41,7 +41,7 @@ export default class MainScene extends Scene {
        
         
         this.mainContainer.add([this.gameBg, this.reelBg])
-        // this.soundManager.playSound("backgroundMusic")
+        this.soundManager.playSound("backgroundMusic")
 
         // Initialize UI Container
         this.uiContainer = new UiContainer(this, () => this.onSpinCallBack(), this.soundManager);
@@ -95,7 +95,7 @@ export default class MainScene extends Scene {
     onResultCallBack() {
         const onSpinMusic = "onSpin"
         this.uiContainer.onSpin(false);
-        // this.soundManager.stopSound(onSpinMusic)
+        this.soundManager.stopSound(onSpinMusic)
         this.lineGenerator.showLines(ResultData.gameData.linesToEmit);
     }
     /**
@@ -104,7 +104,7 @@ export default class MainScene extends Scene {
      */
     onSpinCallBack() {
         const onSpinMusic = "onSpin"
-        // this.soundManager.playSound(onSpinMusic)
+        this.soundManager.playSound(onSpinMusic)
         this.slot.moveReel();
         this.lineGenerator.hideLines();
     }
@@ -119,6 +119,7 @@ export default class MainScene extends Scene {
         if (msgType === 'ResultData') {
             this.time.delayedCall(1000, () => {    
                 if (ResultData.gameData.isBonus) {
+                    this.soundManager.pauseSound("backgroundMusic");
                     setTimeout(() => {
                         Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
                     }, 2000);
@@ -162,8 +163,10 @@ export default class MainScene extends Scene {
                    this.showWinPopup(winAmount, 'jackpotPopup')
                 }
                 this.slot.stopTween();
-                
             });
+        }
+        if(msgType === 'GambleResult'){
+            this.uiContainer.currentWiningText.updateLabelText(gambleResult.gamleResultData.currentWining.toString());
         }
     }
 

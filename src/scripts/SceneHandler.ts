@@ -22,7 +22,7 @@ export class SceneHandler {
         // Check if the scene already exists in Phaser's scene manager
         const existingScene = this.game.scene.getScene(key);
         if (existingScene) {
-            console.log(`Scene with key "${key}" already exists. Destroying the existing scene...`);
+            // console.log(`Scene with key "${key}" already exists. Destroying the existing scene...`);
             // Stop and remove the existing scene if it exists
             this.game.scene.stop(key);
             this.game.scene.remove(key);
@@ -37,7 +37,7 @@ export class SceneHandler {
      * @param key The unique key of the scene to remove.
      */
     removeScene(key: string) {
-        console.log("removeSceneCalled", key);
+        // console.log("removeSceneCalled", key);
         
         if (this.scenes.has(key)) {          
             this.game.scene.remove(key);

@@ -105,13 +105,13 @@ export default class MainLoader extends Scene {
         this.updateProgressBar(1); // Set progress to 100%
         const loadedTextures = this.textures.list;
         Globals.resources = { ...loadedTextures }
-        // Object.entries(LoaderSoundConfig).forEach(([key]) => {
-        //     Globals.soundResources[key] = new Howl({
-        //         src: [LoaderSoundConfig[key]], // Use the same source as you provided for loading
-        //         autoplay: false,
-        //         loop: false,
-        //     });
-        // });
+        Object.entries(LoaderSoundConfig).forEach(([key]) => {
+            Globals.soundResources[key] = new Howl({
+                src: [LoaderSoundConfig[key]], // Use the same source as you provided for loading
+                autoplay: false,
+                loop: false,
+            });
+        });
     }
     public loadScene() {
         this.completeLoading();

@@ -31,7 +31,7 @@ export const LoaderConfig = {
     // rulesBtnH :  "/src/sprites/ButtonRulesHover.png",
     exitButton: "src/sprites/ExitButton.png",
     exitButtonPressed: "src/sprites/ExitButtonHover.png",
-    popupBgimg: "src/sprites/AboutPanel.png",
+    PopupBackground: "src/sprites/PopupBackground.png",
     messagePopup: "src/sprites/messagepopup.png",
     normalButton: "src/sprites/NormalButton.png",
     bigWinPopup: "src/sprites/BigWinPopup.png",
@@ -39,6 +39,8 @@ export const LoaderConfig = {
     megaWinPopup: "src/sprites/MegaWinpopup.png",
     jackpotPopup: "src/sprites/jackpotPopup.png",
     freeSpinPopup: "src/sprites/FreeSpinPopup.png",
+    leftArrow: "src/sprites/leftArrow.png",
+    rightArrow: "src/sprites/RightArrow.png",
     // freeSpinStartButton: "src/sprites/freeSpinStartButton.png",
     // freeSpinStartButtonPressed: "src/sprites/SpinButtonPressed.png",
     // spinCircle: "src/sprites/SpinCircle.png",
@@ -170,7 +172,7 @@ export const LoaderConfig = {
     BackCard1: "src/sprites/Backcard1.png",
     BackCard2: "src/sprites/Backcard2.png",
     BackCard3: "src/sprites/Backcard3.png",
-    Double: "src/sprites/Double.png",
+    Double: "src/sprites/withoutName.png",
     collectButton: "src/sprites/CollectButton.png",
 
     SpadesA:"src/sprites/spadeA.png",
@@ -182,7 +184,7 @@ export const LoaderConfig = {
     Spades7: "src/sprites/spade7.png",
     Spades8: "src/sprites/spade8.png",
     Spades9: "src/sprites/spade9.png",
-    Spade10: "src/sprites/spade10.png",
+    Spades10: "src/sprites/spade10.png",
     SpadesJ: "src/sprites/spadeJ.png",
     SpadesQ: "src/sprites/spadeQ.png",
     SpadesK: "src/sprites/spadeK.png",
@@ -780,12 +782,16 @@ export const fontData = ["Montserrat"];
 
 
 export const LoaderSoundConfig: any = {
-        backgroundMusic: "src/sounds/Teaser.wav",
+        backgroundMusic: "src/sounds/Teaser.mp3",
         onSpin :  "/src/sounds/slot-machine-loop.mp3",
         spinButton: "src/sounds/spin.wav",
         winMusic: "src/sounds/JackpotWinner.mp3",
-        buttonpressed: "src/sounds/Game-Button.wav",
-        spinWheelMusic: "src/sounds/spinWheel.mp3"
+        buttonpressed: "src/sounds/Game-Button.mp3",
+        spinWheelMusic: "src/sounds/spinWheel.mp3",
+        bonusBg: "src/sounds/bonusbg.wav",
+        bonuswin: "src/sounds/bonuswin.wav",
+        cardMusic: "src/sounds/card.mp3",
+        coconutFall: "src/sounds/coconutfall.wav"
  
 };
 

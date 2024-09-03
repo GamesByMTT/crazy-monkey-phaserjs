@@ -13,7 +13,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url('./src/sprites/Background.png');
+    background-image: url('./src/sprites/Background.jpg');
     background-image: cover;
     background-repeat: no-repeat;
 }
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('./src/fonts/Poplar Regular.ttf') format('truetype');
+  }
+  
+  body {
+    font-family: 'Poplar', sans-serif;
+  }

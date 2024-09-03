@@ -3,6 +3,7 @@ import { gameConfig, CalculateScaleFactor } from "./appconfig";
 import { Globals } from "./Globals";
 import { SocketManager } from "../socket";
 import { SceneHandler } from "./SceneHandler";
+import "../../public/style.css"
 
 window.parent.postMessage( "authToken","*");
 

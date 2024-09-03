@@ -3,12 +3,10 @@ import { Globals, initData, TextStyle } from "./Globals";
 import { gameConfig } from "./appconfig";
 import { TextLabel } from "./TextLabel";
 import { UiContainer } from "./UiContainer";
-import MainLoader from "../view/MainLoader";
 import SoundManager from "./SoundManager";
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 const Random = Phaser.Math.Between;
-
+let musiclevel = 0;
 export class UiPopups extends Phaser.GameObjects.Container {
     SoundManager: SoundManager;
     UiContainer: UiContainer
@@ -28,6 +26,10 @@ export class UiPopups extends Phaser.GameObjects.Container {
     soundEnabled: boolean = true; // Track sound state
     musicEnabled: boolean = true; // Track sound state
     normalButtonSound!: Phaser.Sound.BaseSound
+    popupBackground!: Phaser.GameObjects.Sprite;  // Background sprite for popup
+    pageViewContainer!: Phaser.GameObjects.Container;
+    currentPageIndex: number = 0;
+    pages: Phaser.GameObjects.Container[] = [];
     constructor(scene: Phaser.Scene, uiContainer: UiContainer, soundManager: SoundManager) {
         super(scene);
         this.setPosition(0, 0);
@@ -35,8 +37,20 @@ export class UiPopups extends Phaser.GameObjects.Container {
         this.settingBtnInit();
         this.menuBtnInit();
         this.exitButton();
+         // Initialize background sprite for popup with initial opacity of 0 (hidden)
+         this.popupBackground = this.scene.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, 'PopupBackground')
+         .setOrigin(0.5)
+         .setAlpha(0)
+         .setDepth(9); // Set initial transparency to 0 (hidden)
+         this.popupBackground.setDisplaySize(this.popupBackground.width * 0.25, this.popupBackground.height * 0.25); // Make it fullscreen
+
+         // Initialize Page View container
+        this.pageViewContainer = this.scene.add.container(0, 0);
+        this.pageViewContainer.setVisible(false); // Initially hidden
+        this.add(this.pageViewContainer);
         this.UiContainer = uiContainer
         this.SoundManager = soundManager
+        this.initPageView();
         scene.add.existing(this);
     }
 
@@ -47,7 +61,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
         ];
         this.menuBtn = new InteractiveBtn(this.scene, menuBtnTextures, () => {
             this.buttonMusic("buttonpressed")
-            this.openPopUp();
+            // this.openPopUp();
         }, 0, true);
         this.menuBtn.setPosition( gameConfig.scale.width - this.menuBtn.width * 2,  this.menuBtn.height)
         this.add(this.menuBtn);
@@ -72,59 +86,105 @@ export class UiPopups extends Phaser.GameObjects.Container {
         ];
         this.settingBtn = new InteractiveBtn(this.scene, settingBtnSprites, () => {
             this.buttonMusic("buttonpressed")
-            this.openPopUp();
             // setting Button
             this.openSettingPopup();
-        }, 1, false); // Adjusted the position index
-        this.settingBtn.setPosition(gameConfig.scale.width/ 2 - this.settingBtn.width * 6, this.settingBtn.height * 0.7);
+        }, 1, true); // Adjusted the position index
+        this.settingBtn.setPosition(gameConfig.scale.width - this.settingBtn.width * 2, gameConfig.scale.height/2 + this.settingBtn.height * 1.7);
         this.settingBtn.setScale(0.9)
         this.add(this.settingBtn);
     }
 
+   
+    initPageView() {
+        const conatiner = this.scene.add.container(gameConfig.scale.width, gameConfig.scale.height).setInteractive()
+        conatiner.on('pointerdown', (pointerdown: Phaser.Input.Pointer)=>{
+            pointerdown.event.stopPropagation();
+        })
+        // Create pages with the ability to add custom content
+        for (let i = 0; i < 3; i++) {
+            const page = this.scene.add.container(i * gameConfig.scale.width, 100); // Position pages side by side off-screen initially
+            this.pages.push(page);
+            this.pageViewContainer.add(page);
+        }
+        const BonusHeading = this.scene.add.text(gameConfig.scale.width/2, gameConfig.scale.height - 100, "Bonus Game", {color: "#ffffff", align: "center"})
+        this.addCustomContentToPage(0, [BonusHeading]);
+        // Add navigation buttons
+        this.addNavigationButtons();
+    }
 
     openPopUp() {
-        // Toggle the isOpen boolean
-        this.isOpen = !this.isOpen;
-        this.menuBtn.setInteractive(false);
-        if (this.isOpen) {
-            // this.tweenToPosition(this.rulesBtn, 3);
-            this.tweenToPosition(this.settingBtn, 1);
+        if (this.pageViewContainer) {
+            // Set background opacity to semi-transparent and show popup
+            this.popupBackground.setAlpha(1); // Make background semi-transparent
+            this.pageViewContainer.setVisible(true); // Show the PageView container
+            this.currentPageIndex = 0;
+            this.updatePageView();
         } else {
-            // this.tweenBack(this.rulesBtn);
-            this.tweenBack(this.settingBtn);
         }
     }
+    closePopUp() {
+        // Reset visibility and background opacity when closing popup
+        this.pageViewContainer.setVisible(false);
+        this.popupBackground.setAlpha(0); // Hide background
+    }
+    addNavigationButtons() {
+        // Previous Page Button
+        const prevButton = this.scene.add.sprite(250, 550, 'leftArrow')
+        .setScale(0.2)
+        .setDepth(12)
+        .setInteractive()
+        .on('pointerdown', () => this.changePage(-1));
+        this.pageViewContainer.add(prevButton);
 
-    tweenToPosition(button: InteractiveBtn, index: number) {
-        const targetX =  this.menuBtn.x + ((index * 1.2) * (this.menuBtn.width))
-       // Calculate the Y position with spacing
-       button.setPosition(this.menuBtn.x, this.menuBtn.y)
-        button.setVisible(true);
+        // Next Page Button
+        const nextButton = this.scene.add.sprite(gameConfig.scale.width * 0.9, 550, 'rightArrow')
+        .setScale(0.2)
+        .setDepth(11)
+        .setInteractive()
+        .on('pointerdown', () => this.changePage(1));
+        this.pageViewContainer.add(nextButton);
+    }
+    changePage(direction: number) {
+        const nextPageIndex = this.currentPageIndex + direction;
+
+        if (nextPageIndex < 0 || nextPageIndex >= this.pages.length) {
+            return; // Prevent out of bounds
+        }
+
+        // Slide current page out of view and next page into view
+        const currentPage = this.pages[this.currentPageIndex];
+        const nextPage = this.pages[nextPageIndex];
+
         this.scene.tweens.add({
-            targets: button,
-            x: targetX,
-            duration: 300,
-            ease: 'Elastic',
-            easeParams: [1, 0.9],
+            targets: currentPage,
+            x: `-=${gameConfig.scale.width}`,
+            duration: 500,
+            ease: 'Power2'
+        });
+
+        this.scene.tweens.add({
+            targets: nextPage,
+            x: `-=${gameConfig.scale.width}`,
+            duration: 500,
+            ease: 'Power2',
             onComplete: () => {
-                button.setInteractive(true);
-                this.menuBtn.setInteractive(true);
+                this.currentPageIndex = nextPageIndex;
+                this.updatePageView();
             }
         });
     }
-    tweenBack(button: InteractiveBtn) {
-        button.setInteractive(false);
-        this.scene.tweens.add({
-            targets: button,
-            x: button,
-            duration: 100,
-            ease: 'Elastic',
-            easeParams: [1, 0.9],
-            onComplete: () => {
-                button.setVisible(false);
-                this.menuBtn.setInteractive(true);
-            }
-        });
+
+    addCustomContentToPage(pageIndex: number, content: Phaser.GameObjects.GameObject[]) {
+        // Clear existing content on the page
+        this.pages[pageIndex].removeAll(true);
+
+        // Add new custom content to the specified page
+        content.forEach(item => this.pages[pageIndex].add(item));
+    }
+
+
+    updatePageView(){
+
     }
     /**
      * 
@@ -162,13 +222,6 @@ export class UiPopups extends Phaser.GameObjects.Container {
         soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel - soundProgreesBar.width / 1.5);
         musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel - musicProgreesBar.width / 2.5);
 
-        const toggleBarSprite = [
-            this.scene.textures.get('toggleBar'),
-            this.scene.textures.get('toggleBar')
-        ];
-        if(this.soundEnabled){
-            
-        }
         const exitButtonSprites = [
             this.scene.textures.get('crossButton'),
             this.scene.textures.get('crossButtonHover')
@@ -221,18 +274,26 @@ export class UiPopups extends Phaser.GameObjects.Container {
 
     // Function to adjust sound volume
     adjustSoundVolume(level:number) {
-        // Implement sound volume adjustment logic here
-        this.scene.sound.volume = level; // Example using Phaser sound manager
+        let adjustMusicVolume
+        adjustMusicVolume = parseFloat(level.toFixed(1))
+        adjustMusicVolume = adjustMusicVolume < 0 ? 0: adjustMusicVolume 
+        if(adjustMusicVolume < 0 ){
+            this.SoundManager.setVolume("backgroundMusic", adjustMusicVolume)
+        }
     }
 
     // Function to adjust music volume
     adjustMusicVolume(level: number) {
-        // Implement music volume adjustment logic here
-        this.scene.sound.volume = level; // Example using Phaser sound manager
+        let adjustMusicVolume
+        adjustMusicVolume = parseFloat(level.toFixed(1))
+        adjustMusicVolume = adjustMusicVolume < 0 ? 0: adjustMusicVolume 
+        if(adjustMusicVolume < 0 ){
+            this.SoundManager.setVolume("backgroundMusic", adjustMusicVolume)
+        }
     }
     
     buttonMusic(key: string){
-        // this.SoundManager.playSound(key)
+        this.SoundManager.playSound(key)
     }
 
     /**

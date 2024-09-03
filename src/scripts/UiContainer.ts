@@ -42,10 +42,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.winBtnInit();
         this.balanceBtnInit();
         this.BetBtnInit();
-        this.doubleBtnInit();
         this.SoundManager = soundManager;
-        // this.freeSpininit();
-        // this.vaseInit();
     }
 
     /**
@@ -92,19 +89,17 @@ export class UiContainer extends Phaser.GameObjects.Container {
         winPanel.setOrigin(0.5);
         // winPanel.setScale(0.8, 0.8)
         winPanel.setPosition(gameConfig.scale.width/2, gameConfig.scale.height/2 + (winPanel.width *0.9));
-
         const currentWining: any = ResultData.playerData.currentWining;
-       
         this.currentWiningText = new TextLabel(this.scene, 0, 7, currentWining, 40, "#FFFFFF");
         const winPanelChild = this.scene.add.container(winPanel.x, winPanel.y)
         winPanelChild.add(this.currentWiningText);
         if(currentWining > 0){
-            console.log(currentWining, "currentWining");
+            // console.log(currentWining, "currentWining");
             this.scene.tweens.add({
                 targets:  this.currentWiningText,
                 scaleX: 1.3, 
                 scaleY: 1.3, 
-                duration: 800, // Duration of the scale effect
+                duration: 500, // Duration of the scale effect
                 yoyo: true, 
                 repeat: -1, 
                 ease: 'Sine.easeInOut' // Easing function
@@ -137,6 +132,9 @@ export class UiContainer extends Phaser.GameObjects.Container {
             // this.spinButtonSound = this.scene.sound.add("spinButton", {loop: false, volume: 0.8})
             // this.spinButtonSound.play();
                 this.bnuttonMusic("spinButton");
+                if(this.doubleButton){
+                    this.doubleButton.destroy();   
+                }
             // checking if autoSpining is working or not if it is auto Spining then stop it
             if(this.isAutoSpinning){
                 this.autoBetBtn.emit('pointerdown'); // Simulate the pointerdown event
@@ -146,8 +144,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
         // tween added to scale transition
             this.scene.tweens.add({
                 targets: this.spinBtn,
-                scaleX: 1.1,
-                scaleY: 1.1,
                 duration: 100,
                 onComplete: () => {
                     // Send message and update the balance
@@ -157,18 +153,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
                     // Trigger the spin callback
                     this.onSpin(true);
                     spinCallBack();
-
-                    // Scale back to original size 
-                    this.scene.tweens.add({
-                        targets: this.spinBtn,
-                        scaleX: 1,
-                        scaleY: 1,
-                        duration: 100,
-                        onComplete: () => {
-                            
-                        }
-                    });
-                    // 
                 }
             });
         }).setDepth(1);
@@ -212,25 +196,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
         
         }).setDepth(0);      
     }
-
-    //** */    
-
-    doubleBtnInit(){
-        const textValue = this.currentWiningText.text; // Replace `getText()` with the actual method or property you use to get the text
-        const numericValue = parseFloat(textValue);
-      
-        if(numericValue > 0){
-            this.doubleButton.setAlpha(1)
-            this.doubleButton.setInteractive()
-           
-        }else{
-                this.doubleButton = this.scene.add.sprite(gameConfig.scale.width/2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9 , 'doubleButton');
-                this.doubleButton.disableInteractive();
-                this.doubleButton.setAlpha(0.5)
-        }
-    }
-
-
     /**
      * @method autoSpinBtnInit 
      * @param spinCallBack 
@@ -246,8 +211,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 // this.normalButtonSound.play()
                 this.scene.tweens.add({
                     targets: this.autoBetBtn,
-                    scaleX: 1.2,
-                    scaleY: 1.2,
                     duration: 100,
                     onComplete: () =>{
                         this.isAutoSpinning = !this.isAutoSpinning; // Toggle auto-spin state
@@ -266,15 +229,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
                             // Stop the spin if auto-spin is turned off
                             this.autoSpinRec(false);
                         }
-                        this.scene.tweens.add({
-                            targets: this.autoBetBtn,
-                            scaleX: 1,
-                            scaleY: 1,
-                            duration: 100,
-                            onComplete: () => {
-                                // this.spinBtn.setTexture('spinBtn');
-                            }
-                        });
                     }
                 })
             }
@@ -370,13 +324,15 @@ export class UiContainer extends Phaser.GameObjects.Container {
             this.autoBetBtn.setTexture("autoSpin");
             this.maxbetBtn.disableInteractive();
             this.pBtn.disableInteractive();
+            // this.spinBtn.setAlpha(0.5)
+            this.autoBetBtn.setAlpha(0.5)
         }else{
             this.spinBtn.setTexture("spinBtn");
             this.autoBetBtn.setTexture("autoSpin");
             this.maxbetBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             this.pBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
-            this.spinBtn.setScale(0.8);
-            this.autoBetBtn.setScale(0.8);
+            this.autoBetBtn.setAlpha(1)
+           
         }        
     }
 
@@ -394,6 +350,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
             this.autoBetBtn.disableInteractive();
             this.maxbetBtn.disableInteractive();
             this.pBtn.disableInteractive();
+            this.spinBtn.setAlpha(0.5)
+            this.autoBetBtn.setAlpha(0.5)
             
         }else{
             this.spinBtn.setTexture("spinBtn");
@@ -404,25 +362,53 @@ export class UiContainer extends Phaser.GameObjects.Container {
             this.pBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             this.spinBtn.setScale(0.8);
             this.autoBetBtn.setScale(0.8);
+            this.spinBtn.setAlpha(1)
+            this.autoBetBtn.setAlpha(1)
         }        
     }
 
     bnuttonMusic(key: string){
-        // this.SoundManager.playSound(key)
+        this.SoundManager.playSound(key)
     }
     update() {
         // Check the value of this.currentWiningText.text
         if (parseFloat(this.currentWiningText.text) > 0) {
-            this.doubleButton.alpha = 1;
-            this.doubleButton.setInteractive();
-            this.doubleButton = this.createButton('doubleButton', gameConfig.scale.width/2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9 , ()=>{
-                // {"data":{"GAMBLETYPE":"HIGHCARD"},"id":"GambleInit"}
-                Globals.Socket?.sendMessage("GambleInit", {id: "GambleInit", GAMBLETYPE: "HIGHCARD"});
-                Globals.SceneHandler?.addScene('GambleScene', GambleScene, true)
-            })
+            // If doubleButton does not exist, create it
+            if (!this.doubleButton || this.doubleButton.scene == undefined) {
+                this.doubleButton = this.createButton('doubleButton', gameConfig.scale.width / 2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9, () => {
+                    Globals.Socket?.sendMessage("GambleInit", { id: "GambleInit", GAMBLETYPE: "HIGHCARD" });
+                    Globals.SceneHandler?.addScene('GambleScene', GambleScene, true);
+                });
+    
+                // Start tween for scaling up and down continuously
+                this.scene.tweens.add({
+                    targets: this.doubleButton,
+                    scaleX: 1.1,
+                    scaleY: 1.1,
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+
+                this.scene.tweens.add({
+                    targets:  this.currentWiningText,
+                    scaleX: 1.3, 
+                    scaleY: 1.3, 
+                    duration: 500, // Duration of the scale effect
+                    yoyo: true, 
+                    repeat: -1, 
+                    ease: 'Sine.easeInOut' // Easing function
+                });
+            }
         } else {
-            this.doubleButton.alpha = 0.5;
-            this.doubleButton.disableInteractive();
+            // If currentWiningText.text is 0 and doubleButton exists, destroy it
+            if (this.doubleButton) {
+                // Stop all tweens associated with doubleButton
+                this.scene.tweens.killTweensOf(this.doubleButton);
+                this.doubleButton.destroy();               
+            }
         }
     }
+    
 }
