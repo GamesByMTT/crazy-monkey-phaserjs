@@ -95,6 +95,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: 'public/src/sprites', to: 'src/sprites' },
+                { from: 'public/src/sounds', to: 'src/sounds' },
                 { from: 'public/favicon.png', to: 'favicon.png' },
                 { from: 'public/style.css', to: 'style.css' }
             ],
