@@ -30,7 +30,7 @@ export default class MainLoader extends Scene {
         this.load.image("logo", "src/sprites/CrazyMonkeyLogo.png");
         this.load.image("loadingText", "src/sprites/loadingText.png");
         this.load.image('loaderBg', "src/sprites/loaderBg.png")
-        this.load.image("assetsloader", "src/sprites/assetsLoader.png")
+        this.load.image("assetsloader", "src/sprites/assetsloader.png")
        
         // Once the background image is loaded, start loading other assets
         this.load.once('complete', () => {
