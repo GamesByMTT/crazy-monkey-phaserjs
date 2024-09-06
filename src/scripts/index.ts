@@ -25,7 +25,7 @@ if(!IS_DEV){
 else{
   const data  = {
     socketUrl : "https://game-crm-rtp-backend.onrender.com/",
-    authToken : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YzU4M2RkMWJkNzI4Zjg3YTM0ZWQ2OSIsInVzZXJuYW1lIjoiYXJwaXQiLCJyb2xlIjoicGxheWVyIiwiaWF0IjoxNzI0ODIzNTU5LCJleHAiOjE3MjU0MjgzNTl9.44XaAN09oapDet8ZV847JZqMJ-v8Z2O0nPjJM7NSB88",
+    authToken : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZDg1MjhmYTI3YmY5MDI0NDNlYmExZiIsInVzZXJuYW1lIjoiYXJwaXQiLCJyb2xlIjoicGxheWVyIiwiaWF0IjoxNzI1NTk0MTQ3LCJleHAiOjE3MjYxOTg5NDd9.GcM8ApSCzAxu2e4TDy5tSsyhB5f4HovMBCnBEpaNMMg",
   }
   Globals.Socket = new SocketManager();
   Globals.Socket.onToken(data);
