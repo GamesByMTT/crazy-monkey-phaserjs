@@ -334,8 +334,6 @@ export class UiPopups extends Phaser.GameObjects.Container {
             this.UiContainer.onSpin(false);
             popupContainer.destroy();
             blurGraphic.destroy(); // Destroy blurGraphic when popup is closed
-            console.log("check yes click");
-            
             window.parent.postMessage("onExit", "*");   
             Globals.Socket?.socket.emit("EXIT", {});
         }, 0, true);

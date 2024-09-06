@@ -44,14 +44,14 @@ export default class InfoScene extends Scene{
         const symbol8 = this.add.sprite(1400, 500, "inofIcon8").setScale(0.22)
         console.log(initData.UIData.symbols[0], "initData.UIData.symbols[0]");
         const infoIcons = [
-            { x: 620, y: 300 }, // Position for infoIcon2
-            { x: 920, y: 300 }, // Position for infoIcon3
-            { x: 1220, y: 300 }, //
-            { x: 1520, y: 300 }, //
-            { x: 620, y: 500 }, //
-            { x: 920, y: 500 }, //
-            { x: 1220, y: 500 }, //
-            { x: 1520, y: 500 }, //
+            { x: 590, y: 300 }, // Position for infoIcon2
+            { x: 890, y: 300 }, // Position for infoIcon3
+            { x: 1190, y: 300 }, //
+            { x: 1490, y: 300 }, //
+            { x: 590, y: 500 }, //
+            { x: 890, y: 500 }, //
+            { x: 1190, y: 500 }, //
+            { x: 1490, y: 500 }, //
         ]
 
          initData.UIData.symbols.forEach((symbol, symbolIndex) => {
@@ -62,21 +62,25 @@ export default class InfoScene extends Scene{
 
             // Loop through each multiplier in the current symbol
             
-            symbol.multiplier.forEach((multiplierValue, multiplierIndex, array) => {
-                if (multiplierValue !== 0) {  // Skip the loop iteration if multiplierValue is 0
-                    // Determine the text (e.g., '5x', '4x', '2x')
-                    const prefix = [5, 4, 2][multiplierIndex]; // Customize this if needed
-                    console.log(multiplierValue, "multiplierValue");
-                    let text = `${prefix}x ${multiplierValue}`;            
-                    // Create the text object
-                    const textObject = this.add.text(
-                        iconPosition.x, // X position (you might want to offset this)
-                        iconPosition.y + multiplierIndex * 20, // Y position (spacing between lines)
-                        text,
-                        { fontSize: '16px', color: '#fff' } // Customize text style
-                    );
-                    // Optionally adjust the position further based on requirements
-                    textObject.setOrigin(0.5, 0.5); // Center the text if needed
+            symbol.multiplier.forEach((multiplierValueArray, multiplierIndex, array) => {
+                if (Array.isArray(multiplierValueArray)) {
+                    const multiplierValue = multiplierValueArray[0];
+                    if (multiplierValue > 0) {  // Skip the loop iteration if multiplierValue is 0
+                        // Determine the text (e.g., '5x', '4x', '2x')
+                        const prefix = [5, 4, 2][multiplierIndex]; // Customize this if needed
+                        console.log(multiplierValue, "multiplierValue");
+                        let text = `${prefix}x ${multiplierValue}`;            
+                        // Create the text object
+                        const textObject = this.add.text(
+                            iconPosition.x, // X position (you might want to offset this)
+                            iconPosition.y + multiplierIndex * 20, // Y position (spacing between lines)
+                            text,
+                            { fontSize: '30px', color: '#fff' } // Customize text style
+                        );
+                        // Optionally adjust the position further based on requirements
+                        textObject.setLineSpacing(10)
+                        textObject.setOrigin(0, 0.5); // Center the text if needed
+                    }
                 }
             });
             

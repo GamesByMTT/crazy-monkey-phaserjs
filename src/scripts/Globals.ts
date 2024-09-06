@@ -40,6 +40,7 @@ interface SymbolType {
   multiplier: number[]; // Assuming multiplier is an array of numbers
   defaultAmount: object;
   symbolsCount: object;
+  description: string
 }
 
 export const initData = {
