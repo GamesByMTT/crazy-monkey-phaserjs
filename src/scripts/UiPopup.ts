@@ -336,7 +336,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
             blurGraphic.destroy(); // Destroy blurGraphic when popup is closed
             console.log("check yes click");
             
-            window.parent.postMessage("onExit", "*");
+            window.parent.postMessage("onExit", "*");   
             Globals.Socket?.socket.emit("EXIT", {});
         }, 0, true);
         const logoutNoButtonSprite = [
