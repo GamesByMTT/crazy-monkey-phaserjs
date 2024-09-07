@@ -1,3 +1,5 @@
+import { disconnect } from "process";
+
 // import { Background } from './Background';
 export const LoaderConfig = {
     // frame : "/src/sprites/SlotMachine_3x5.png",
@@ -51,6 +53,7 @@ export const LoaderConfig = {
     crossButton: "src/sprites/crossButton.png",
     crossButtonHover: "src/sprites/crossButtonHover.png",
     infoCross: "src/sprites/infoCross.png",
+    disconnectClose: "src/sprites/closeButton.png",
 
     logo: "src/sprites/crazyMonkeyLogo.png",
     loadingText:"src/sprite/loadingText.png",

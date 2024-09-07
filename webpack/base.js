@@ -41,6 +41,15 @@ module.exports = {
         use: ["style-loader", "css-loader"],
       },
       {
+        test: /\.(ttf|woff|woff2|eot)$/, // Rule for font files
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: 'public/src/fonts/Poplar Regular.ttf', // Output fonts in a folder
+          },
+        },
+      },
+      {
         test: /\.ttf$/,
         use: [
           {
