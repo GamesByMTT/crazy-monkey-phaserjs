@@ -122,7 +122,7 @@ export default class MainScene extends Scene {
                     this.soundManager.pauseSound("backgroundMusic");
                     setTimeout(() => {
                         Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
-                    }, 2000);
+                    }, 600);
                 }         
                 this.uiContainer.currentWiningText.updateLabelText(ResultData.playerData.currentWining.toString());
                 currentGameData.currentBalance = ResultData.playerData.Balance;

@@ -25,6 +25,7 @@
     "copy-webpack-plugin": "^9.0.0",
     "css-loader": "^5.2.2",
     "dotenv-webpack": "^8.1.0",
+    "@types/webfontloader": "^1.6.38",
     "eslint": "^8.14.0",
     "eslint-plugin-jest": "26.1.5",
     "file-loader": "^6.2.0",

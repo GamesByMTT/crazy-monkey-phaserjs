@@ -94,7 +94,7 @@ export default class InfoScene extends Scene{
                             iconPosition.x, // X position (you might want to offset this)
                             iconPosition.y + multiplierIndex * 60, // Y position (spacing between lines)
                             text,
-                            { fontFamily: "Poplar Regular", fontSize: '30px', color: '#fff' } // Customize text style
+                            { fontFamily: "Poplar", fontSize: '30px', color: '#fff', } // Customize text style
                         );
                         // Optionally adjust the position further based on requirements
                         textObject.setLineSpacing(100)

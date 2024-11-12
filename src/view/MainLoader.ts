@@ -7,6 +7,7 @@ import { Globals } from "../scripts/Globals";
 import SoundManager from "../scripts/SoundManager";
 import { Howl } from "howler";
 import GambleScene from "./GambleScene";
+import WebFont from "webfontloader";
 
 export default class MainLoader extends Scene {
     resources: any;
@@ -25,29 +26,26 @@ export default class MainLoader extends Scene {
     }
 
     preload() {
-        // Load the background image first
-        // this.load.image("Background", "src/sprites/Background.jpg");
+
         this.load.image("logo", "src/sprites/CrazyMonkeyLogo.png");
         this.load.image("loadingText", "src/sprites/loadingText.png");
         this.load.image('loaderBg', "src/sprites/loaderBg.png")
         this.load.image("assetsloader", "src/sprites/assetsloader.png")
-       
         // Once the background image is loaded, start loading other assets
         this.load.once('complete', () => {
             this.addBackgroundImage();
             this.startLoadingAssets();
         });
+        this.setupFontLoader();
     }
 
     private addBackgroundImage() {
         const { width, height } = this.scale;
         // this.add.image(width / 2, height / 2, 'Background').setOrigin(0.5).setDisplaySize(width, height);
         this.logoImage = this.add.sprite(width/2, 400, 'logo').setScale(0.2, 0.2)
- 
         // Initialize progress bar graphics
         this.loaderText = this.add.sprite(width/2, height/2 + 115, 'loadingText').setScale(0.2)
         this.progressBox = this.add.sprite(width / 2, height / 2 + 180, "loaderBg").setScale(0.2); 
-
         // Initialize progress bar using assetsLoader.png image
         this.progressBar = this.add.sprite(width / 2, height / 2+175, "assetsloader").setOrigin(0.5).setScale(0.2);
         this.progressBar.setCrop(0, 0, 0, this.progressBar.height); // Start with 0 width
@@ -58,12 +56,6 @@ export default class MainLoader extends Scene {
         Object.entries(LoaderConfig).forEach(([key, value]) => {
             this.load.image(key, value);
         });
-        // Preload all sounds from LoaderSoundConfig
-        // Object.entries(LoaderSoundConfig).forEach(([key, value]) => {
-        //     if (typeof value === "string") {
-        //         this.load.audio(key, [value]); // Cast value to string
-        //     }
-        // });
         // Start loading assets and update progress bar
         this.load.start();
 
@@ -74,7 +66,6 @@ export default class MainLoader extends Scene {
         });
 
         this.load.on('complete', () => {
-            // Only complete progress after socket initialization
             if (Globals.Socket?.socketLoaded) {
                 this.loadScene();
             }
@@ -84,9 +75,19 @@ export default class MainLoader extends Scene {
     private updateProgressBar(value: number) {
         const { width } = this.scale;
         if (this.progressBar) {
-            // Update the crop width of the progress bar sprite based on the value
             this.progressBar.setCrop(0, 0, this.progressBar.width * value, this.progressBar.height);
         }
+    }
+    private setupFontLoader() {
+        WebFont.load({
+            custom: {
+                families: ['Poplar'],
+                urls: ['src/fonts/PoplarStdBlack.ttf']
+            },
+            active: () => {
+                // Fonts have loaded
+            }
+        });
     }
 
     private completeLoading() {

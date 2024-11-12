@@ -121,7 +121,6 @@ export default class GambleScene extends Scene {
     }
 
     updateCurrentWinningText() {
-       
         let winAmount = gambleResult.gamleResultData.currentWining
         console.log(winAmount, "new winnning");
         this.currentWinningText.setText(`${winAmount}`);
@@ -148,9 +147,6 @@ export default class GambleScene extends Scene {
     }
 
     getCardTexture(cardData: any) {
-        // You should map the card data to the correct texture here
-        console.log(`${cardData.suit}${cardData.value}`);
-        
         return `${cardData.suit}${cardData.value}`; // Example texture naming
     }
 
