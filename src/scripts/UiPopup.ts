@@ -5,6 +5,7 @@ import { TextLabel } from "./TextLabel";
 import { UiContainer } from "./UiContainer";
 import SoundManager from "./SoundManager";
 import InfoScene from "./infoPopup";
+import { InteractiveBtn } from "./IneractiveBtn";
 
 const Random = Phaser.Math.Between;
 let musiclevel = 0;
@@ -35,9 +36,9 @@ export class UiPopups extends Phaser.GameObjects.Container {
         super(scene);
         this.setPosition(0, 0);
         // this.ruleBtnInit();
-        this.settingBtnInit();
-        this.menuBtnInit();
-        this.exitButton();
+        // this.settingBtnInit();
+        // this.menuBtnInit();
+        // this.exitButton();
          // Initialize background sprite for popup with initial opacity of 0 (hidden)
          this.popupBackground = this.scene.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, 'PopupBackground')
          .setOrigin(0.5)
@@ -69,8 +70,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
     }
     exitButton(){
         const exitButtonSprites = [
-            this.scene.textures.get('exitButton'),
-            this.scene.textures.get('exitButton')
+            this.scene.textures.get('crossButton'),
+            this.scene.textures.get('crossButton')
         ];
         this.exitBtn = new InteractiveBtn(this.scene, exitButtonSprites, ()=>{
                 this.buttonMusic("buttonpressed")
@@ -369,38 +370,3 @@ export class UiPopups extends Phaser.GameObjects.Container {
     }
 }
 
-class InteractiveBtn extends Phaser.GameObjects.Sprite {
-    moveToPosition: number = -1;
-    defaultTexture!: Phaser.Textures.Texture;
-    hoverTexture!: Phaser.Textures.Texture
-
-    constructor(scene: Phaser.Scene, textures: Phaser.Textures.Texture[], callback: () => void, endPos: number, visible: boolean) {
-        super(scene, 0, 0, textures[0].key); // Use texture key
-        this.defaultTexture = textures[0];
-        this.hoverTexture = textures[1];        
-        this.setOrigin(0.5);
-        this.setInteractive();
-        this.setVisible(visible);
-        this.moveToPosition = endPos;
-        this.on('pointerdown', () => {
-            this.setTexture(this.hoverTexture.key)
-            // this.setFrame(1);
-            callback();
-        });
-        this.on('pointerup', () => {
-            this.setTexture(this.defaultTexture.key)
-            // this.setFrame(0);
-        });
-        this.on('pointerout', () => {
-            this.setTexture(this.defaultTexture.key)
-            // this.setFrame(0);
-        });
-        // Set up animations if necessary
-        this.anims.create({
-            key: 'hover',
-            frames: this.anims.generateFrameNumbers(textures[1].key),
-            frameRate: 10,
-            repeat: -1
-        });
-    }
-}

@@ -6,9 +6,11 @@ import { gameConfig } from './appconfig';
 import MainScene from '../view/MainScene';
 import SoundManager from './SoundManager';
 import GambleScene from '../view/GambleScene';
+import { Popupmanager } from './PopupManager';
 // Define UiContainer as a Phaser Scene class
 export class UiContainer extends Phaser.GameObjects.Container {
     SoundManager: SoundManager
+    popupManager: Popupmanager
     spinBtn!: Phaser.GameObjects.Sprite;
     maxbetBtn!: Phaser.GameObjects.Sprite;
     autoBetBtn!: Phaser.GameObjects.Sprite;
@@ -18,7 +20,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
     CurrentBetText!: TextLabel;
     currentWiningText!: TextLabel;
     currentBalanceText!: TextLabel;
-    CurrentLineText!: TextLabel;
+    // CurrentLineText!: TextLabel;
     freeSpinText!: TextLabel;
     pBtn!: Phaser.GameObjects.Sprite;
     mBtn!: Phaser.GameObjects.Sprite
@@ -30,9 +32,13 @@ export class UiContainer extends Phaser.GameObjects.Container {
     freeSpinContainer!: Phaser.GameObjects.Container
     spinButtonSound!: Phaser.Sound.BaseSound
     normalButtonSound!: Phaser.Sound.BaseSound
+    exitBtn!: Phaser.GameObjects.Sprite
+    settingBtn!:Phaser.GameObjects.Sprite
+    infoBtn!: Phaser.GameObjects.Sprite
 
     constructor(scene: Scene, spinCallBack: () => void, soundManager: SoundManager) {
         super(scene);
+        this.popupManager = new Popupmanager(scene)
         scene.add.existing(this); 
         // Initialize UI elements
         this.maxBetInit();
@@ -42,7 +48,11 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.winBtnInit();
         this.balanceBtnInit();
         this.BetBtnInit();
+        this.exitButton()
+        this.settingBtnInit();
+        this.infoButton()
         this.SoundManager = soundManager;
+        this.scene.events.on("updateWin", this.updateData, this)
     }
 
     /**
@@ -50,13 +60,9 @@ export class UiContainer extends Phaser.GameObjects.Container {
      */
     lineBtnInit() { 
         const container = this.scene.add.container(0, 0);
-        // const lineText = new TextLabel(this.scene, -20, -70, "LINES", 30, "#3C2625");
-        const linePanel = this.scene.add.sprite(0, 0, "lines").setDepth(0);
-        linePanel.setOrigin(0.5);
-        linePanel.setPosition(linePanel.width * 1.2, gameConfig.scale.height/2 - 100);
         // container.add(lineText);
         this.pBtn = this.createButton('pBtn', gameConfig.scale.width / 2 - this.maxbetBtn.width / 1.3, gameConfig.scale.height - this.maxbetBtn.height * 0.7, () => {
-            this.bnuttonMusic("buttonpressed");
+            this.buttonMusic("buttonpressed");
             this.pBtn.setTexture('pBtnH');
             this.pBtn.disableInteractive();
             if (!currentGameData.isMoving) {
@@ -66,8 +72,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 }
                 const betAmount = initData.gameData.Bets[currentGameData.currentBetIndex];
                 const updatedBetAmount = betAmount * 20;
-                this.CurrentLineText.updateLabelText(betAmount);
-                this.CurrentBetText.updateLabelText(updatedBetAmount.toString());
+                // this.CurrentLineText.updateLabelText(betAmount);
+                this.CurrentBetText.updateLabelText(updatedBetAmount.toFixed(3).toString());
             }
             this.scene.time.delayedCall(200, () => {
                 this.pBtn.setTexture('pBtn');
@@ -75,9 +81,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
             });
         }).setDepth(0);
         container.add(this.pBtn);
-        this.CurrentLineText = new TextLabel(this.scene, linePanel.x, linePanel.y + 55, initData.gameData.Bets[currentGameData.currentBetIndex], 27, "#ffffff");
-        //Line Count
-        container.add(this.CurrentLineText).setDepth(1)
     }
 
     /**
@@ -90,7 +93,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         // winPanel.setScale(0.8, 0.8)
         winPanel.setPosition(gameConfig.scale.width/2, gameConfig.scale.height/2 + (winPanel.width *0.9));
         const currentWining: any = ResultData.playerData.currentWining;
-        this.currentWiningText = new TextLabel(this.scene, 0, 7, currentWining, 40, "#FFFFFF");
+        this.currentWiningText = new TextLabel(this.scene, 0, 7, currentWining, 45, "#FFFFFF");
         const winPanelChild = this.scene.add.container(winPanel.x, winPanel.y)
         winPanelChild.add(this.currentWiningText);
         if(currentWining > 0){
@@ -131,7 +134,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.spinBtn = this.createButton('spinBtn', gameConfig.scale.width / 1.15, gameConfig.scale.height - this.spinBtn.height/1.1, () => {
             // this.spinButtonSound = this.scene.sound.add("spinButton", {loop: false, volume: 0.8})
             // this.spinButtonSound.play();
-                this.bnuttonMusic("spinButton");
+                this.buttonMusic("spinButton");
                 if(this.doubleButton){
                     this.doubleButton.destroy();   
                 }
@@ -167,7 +170,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.maxbetBtn =  new Phaser.GameObjects.Sprite(this.scene, 0, 0, 'maxBetBtn');
         this.maxbetBtn = this.createButton('maxBetBtn', gameConfig.scale.width / 2 + this.maxbetBtn.width * 0.25, gameConfig.scale.height - this.maxbetBtn.height * 0.7 , () => {
             if (this.SoundManager) {
-                this.bnuttonMusic("buttonpressed");
+                this.buttonMusic("buttonpressed");
             }
             this.scene.tweens.add({
                 targets: this.maxbetBtn,
@@ -179,7 +182,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
                     this.maxbetBtn.disableInteractive()
                     currentGameData.currentBetIndex = initData.gameData.Bets[initData.gameData.Bets.length - 1];
                     this.CurrentBetText.updateLabelText((currentGameData.currentBetIndex*20).toString());
-                    this.CurrentLineText.updateLabelText(initData.gameData.Bets[initData.gameData.Bets.length - 1]);
+                    // this.CurrentLineText.updateLabelText(initData.gameData.Bets[initData.gameData.Bets.length - 1]);
                     this.scene.tweens.add({
                         targets: this.maxbetBtn,
                         scaleX: 1,
@@ -367,7 +370,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         }        
     }
 
-    bnuttonMusic(key: string){
+    buttonMusic(key: string){
         this.SoundManager.playSound(key)
     }
     update() {
@@ -391,15 +394,15 @@ export class UiContainer extends Phaser.GameObjects.Container {
                     ease: 'Sine.easeInOut'
                 });
 
-                this.scene.tweens.add({
-                    targets:  this.currentWiningText,
-                    scaleX: 1.3, 
-                    scaleY: 1.3, 
-                    duration: 500, // Duration of the scale effect
-                    yoyo: true, 
-                    repeat: -1, 
-                    ease: 'Sine.easeInOut' // Easing function
-                });
+                // this.scene.tweens.add({
+                //     targets:  this.currentWiningText,
+                //     scaleX: 1.3, 
+                //     scaleY: 1.3, 
+                //     duration: 500, // Duration of the scale effect
+                //     yoyo: true, 
+                //     repeat: -1, 
+                //     ease: 'Sine.easeInOut' // Easing function
+                // });
             }
         } else {
             // If currentWiningText.text is 0 and doubleButton exists, destroy it
@@ -410,5 +413,142 @@ export class UiContainer extends Phaser.GameObjects.Container {
             }
         }
     }
+
+    exitButton(){
+        this.exitBtn =  new Phaser.GameObjects.Sprite(this.scene, 0, 0, 'crossButton');
+        this.exitBtn = this.createButton('crossButton', gameConfig.scale.width * 0.8, gameConfig.scale.height * 0.14 , () => {
+            if (this.SoundManager) {
+                this.buttonMusic("buttonpressed");
+            }
+            this.scene.tweens.add({
+                targets: this.exitBtn,
+                scaleX: 1.1,
+                scaleY: 1.1,
+                duration: 100,
+                onComplete: ()=>{
+                    this.exitBtn.setTexture("crossButton")
+                    this.exitBtn.disableInteractive()
+                    this.popupManager.showLogoutPopup()
+                    this.scene.tweens.add({
+                        targets: this.exitBtn,
+                        scaleX: 1,
+                        scaleY: 1,
+                        duration: 100,
+                        onComplete: ()=>{
+                            this.exitBtn.setTexture("crossButton");
+                            this.exitBtn.setInteractive({ useHandCursor: true, pixelPerfect: true })
+                        }
+                    })
+                    
+                }
+            })
+        
+        });
+    }
+
+    settingBtnInit(){
+        this.settingBtn = new Phaser.GameObjects.Sprite(this.scene, 0, 0, "settingBtn").setOrigin(0.5).setInteractive().setScale(0.45)
+        this.settingBtn = this.createButton("settingBtn", gameConfig.scale.width * 0.13, gameConfig.scale.height * 0.65, ()=>{
+            if(this.SoundManager){
+                this.buttonMusic("buttonpressed")
+            }
+            this.scene.tweens.add({
+                targets: this.settingBtn,
+                scaleX: 1.1,
+                scaleY: 1.1,
+                duration: 100,
+                onComplete: ()=>{
+                    this.settingBtn.setTexture("settingBtn")
+                    this.settingBtn.disableInteractive()
+                    this.popupManager.showSettingPopup()
+                    this.scene.tweens.add({
+                        targets: this.settingBtn,
+                        scaleX: 1,
+                        scaleY: 1,
+                        duration: 100,
+                        onComplete: ()=>{
+                            this.settingBtn.setTexture("settingBtn");
+                            this.settingBtn.setInteractive({ useHandCursor: true, pixelPerfect: true })
+                        }
+                    })
+                    
+                }
+            })
+        })
+    }
+
+    infoButton(){
+        this.infoBtn = new Phaser.GameObjects.Sprite(this.scene, 0, 0, "MenuBtn").setOrigin(0.5)
+        this.infoBtn = this.createButton("MenuBtn", gameConfig.scale.width * 0.13, gameConfig.scale.height * 0.55, ()=>{
+            if(this.SoundManager){
+                this.buttonMusic("buttonpressed")
+            }
+            this.popupManager.showInfoPoup();
+        })
+    }
+
+    updateData(){
+        const startValue = parseFloat(this.currentBalanceText.text);
+        const endValue = ResultData.playerData.Balance;
+        // Create the tween
+        this.scene.tweens.add({
+            targets: { value: startValue },
+            value: endValue,
+            duration: 1000, // Duration in milliseconds
+            ease: 'Linear',
+            onUpdate: (tween) => {
+                // Update the text during the tween
+                const currentValue = tween.getValue();
+                this.currentBalanceText.updateLabelText(currentValue.toFixed(3).toString());
+            },
+            onComplete: () => {
+                this.currentBalanceText.updateLabelText(endValue.toFixed(3).toString());
+            }
+        });
+
+        //Animation for win Text
+        const winStart = parseFloat(this.currentWiningText.text);
+        const winendValue = ResultData.playerData.currentWining;
+        // Create the tween
+        this.scene.tweens.add({
+            targets: { value: winStart },
+            value: winendValue,
+            duration: 500, // Duration in milliseconds
+            ease: 'Linear',
+            onUpdate: (tween) => {
+                // Update the text during the tween
+                const currentWinValue = tween.getValue();
+                this.currentWiningText.updateLabelText(currentWinValue.toFixed(3).toString());
+            },
+            onComplete: () => {
+                // Ensure final value is exact
+                this.currentWiningText.updateLabelText(winendValue.toFixed(3).toString());
+            }
+        });
+       
+        // if (ResultData.gameData.isBonus) {
+        //     currentGameData.bonusOpen = true;
+        //     this.scene.events.emit("bonusStateChanged", true);
+        //     this.popupManager.showBonusPopup({
+        //         onClose: () => {
+        //             currentGameData.bonusOpen = false;
+        //             this.scene.events.emit("bonusStateChanged", false);
+        //         }
+        //     });
+        // }
+    }
+
+    // exitButton(){
+    //     const exitButtonSprites = [
+    //         this.scene.textures.get('crossButton'),
+    //         this.scene.textures.get('crossButton')
+    //     ];
+    //     this.exitBtn = new InteractiveBtn(this.scene, exitButtonSprites, ()=>{
+    //             this.buttonMusic("buttonpressed")
+    //             // this.openLogoutPopup();
+    //     }, 0, true, );
+    //     this.exitBtn.setPosition(this.exitBtn.width , this.exitBtn.height)
+    //     this.add(this.exitBtn)
+    // }
     
 }

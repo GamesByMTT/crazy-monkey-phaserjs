@@ -2,7 +2,7 @@ import { Scene, GameObjects, Scale } from 'phaser';
 import { Slots } from '../scripts/Slots';
 import { UiContainer } from '../scripts/UiContainer';
 import { LineGenerator, Lines } from '../scripts/Lines';
-import { UiPopups } from '../scripts/UiPopup';
+// import { UiPopups } from '../scripts/UiPopup';
 import LineSymbols from '../scripts/LineSymbols';
 import { Globals, ResultData, currentGameData, initData, gambleResult } from '../scripts/Globals';
 import { gameConfig } from '../scripts/appconfig';
@@ -17,7 +17,7 @@ export default class MainScene extends Scene {
     lineGenerator!: LineGenerator;
     soundManager!: SoundManager
     uiContainer!: UiContainer;
-    uiPopups!: UiPopups;
+    // uiPopups!: UiPopups;
     lineSymbols!: LineSymbols
     onSpinSound!: Phaser.Sound.BaseSound
     private mainContainer!: Phaser.GameObjects.Container;
@@ -54,9 +54,9 @@ export default class MainScene extends Scene {
         this.lineGenerator = new LineGenerator(this, this.slot.slotSymbols[0][0].symbol.height + 50, this.slot.slotSymbols[0][0].symbol.width + 10);
         this.mainContainer.add(this.lineGenerator);
 
-        // Initialize UI Popups
-        this.uiPopups = new UiPopups(this, this.uiContainer, this.soundManager);
-        this.mainContainer.add(this.uiPopups)
+        // // Initialize UI Popups
+        // this.uiPopups = new UiPopups(this, this.uiContainer, this.soundManager);
+        // this.mainContainer.add(this.uiPopups)
 
         // Initialize LineSymbols
         this.lineSymbols = new LineSymbols(this, 10, 12, this.lineGenerator)
@@ -124,7 +124,7 @@ export default class MainScene extends Scene {
                         Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
                     }, 600);
                 }         
-                this.uiContainer.currentWiningText.updateLabelText(ResultData.playerData.currentWining.toString());
+                // this.uiContainer.currentWiningText.updateLabelText(ResultData.playerData.currentWining.toString());
                 currentGameData.currentBalance = ResultData.playerData.Balance;
                 let betValue = (initData.gameData.Bets[currentGameData.currentBetIndex]) * 20
                 let jackpot = ResultData.gameData.jackpot
