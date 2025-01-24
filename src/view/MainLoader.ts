@@ -6,7 +6,6 @@ import { LoaderConfig, LoaderSoundConfig } from "../scripts/LoaderConfig";
 import { Globals } from "../scripts/Globals";
 import SoundManager from "../scripts/SoundManager";
 import { Howl } from "howler";
-import GambleScene from "./GambleScene";
 import WebFont from "webfontloader";
 
 export default class MainLoader extends Scene {

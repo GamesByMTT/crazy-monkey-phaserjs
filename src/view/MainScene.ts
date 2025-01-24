@@ -7,6 +7,7 @@ import LineSymbols from '../scripts/LineSymbols';
 import { Globals, ResultData, currentGameData, initData, gambleResult } from '../scripts/Globals';
 import { gameConfig } from '../scripts/appconfig';
 import BonusScene from './BonusScene';
+import { Popupmanager } from '../scripts/PopupManager';
 import SoundManager from '../scripts/SoundManager';
 
 export default class MainScene extends Scene {
@@ -121,6 +122,7 @@ export default class MainScene extends Scene {
                 if (ResultData.gameData.isBonus) {
                     this.soundManager.pauseSound("backgroundMusic");
                     setTimeout(() => {
+                        currentGameData.bonusOpen = true
                         Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
                     }, 600);
                 }         

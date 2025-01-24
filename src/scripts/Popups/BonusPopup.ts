@@ -1,10 +1,10 @@
-import Phaser, { Scene } from "phaser";
-import { currentGameData, Globals, ResultData } from "../scripts/Globals";
-import SoundManager from "../scripts/SoundManager";
+import { Scene, GameObjects } from "phaser";
+import { Globals, ResultData, initData, currentGameData } from "../Globals";
+import SoundManager from "../SoundManager";
+import { gameConfig } from "../appconfig";
 
-export default class BonusScene extends Scene {
-    public bonusContainer!: Phaser.GameObjects.Container;
-    SoundManager!: SoundManager;  // Declare the type
+export class BonusPopup extends Phaser.GameObjects.Container {
+    soundManager: SoundManager
     SceneBg!: Phaser.GameObjects.Sprite;
     winBg!: Phaser.GameObjects.Sprite;
     private spriteObjects: Phaser.GameObjects.Sprite[] = [];
@@ -14,29 +14,23 @@ export default class BonusScene extends Scene {
     private bonusResults: string[] = ['20', '40', '30', '50', '0']; // Array of values to show
     private totalWinAmount: number = 0;
     private winamountText!: Phaser.GameObjects.Text;
+    constructor(scene: Scene) {
+        super(scene)
+        this.soundManager = new SoundManager(this.scene)
 
-    constructor() {
-        super({ key: 'BonusScene' });
-        this.SoundManager = new SoundManager(this); 
-    }
-
-    create() {
-        
-        const { width, height } = this.cameras.main;
-        this.bonusContainer = this.add.container();
-        this.SoundManager.playSound("bonusBg");
-        this.SceneBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 2, 'Background')
-            .setDisplaySize(width, height)
+        this.soundManager.playSound("bonusBg");
+        this.SceneBg = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width / 2, gameConfig.scale.height / 2, 'Background')
+            .setDisplaySize(gameConfig.scale.width, gameConfig.scale.height)
             .setDepth(11)
             .setInteractive();
-        this.SceneBg.on('pointerdown', (pointer:Phaser.Input.Pointer)=>{
+        this.SceneBg.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
             pointer.event.stopPropagation();
         })
-        this.winBg = new Phaser.GameObjects.Sprite(this, width * 0.9, height / 2.1, "winBg");
-        
+        this.winBg = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width * 0.9, gameConfig.scale.height / 2.1, "winBg");
+
         // let winamount = this.add.text(width * 0.895, height / 2, ResultData.gameData.WinAmout.toString(), { font: "40px Arial", color: "#fff" });
-        this.winamountText = this.add.text(width * 0.9, height / 2, this.totalWinAmount.toString(), { font: "40px Arial", color: "#fff",  align: 'center',  }).setOrigin(0.5);
-        this.bonusContainer.add([this.SceneBg, this.winBg, this.winamountText]);
+        this.winamountText = this.scene.add.text(gameConfig.scale.width * 0.9, gameConfig.scale.height / 2, this.totalWinAmount.toString(), { font: "40px Arial", color: "#fff", align: 'center', }).setOrigin(0.5);
+        this.add([this.SceneBg, this.winBg, this.winamountText]);
 
         // Initialize sprite names and animations
         for (let i = 0; i <= 29; i++) {
@@ -51,20 +45,23 @@ export default class BonusScene extends Scene {
 
         // Create coconut sprites and set up interactivity
         xPositions.forEach((xPos: number, index: number) => {
-            const coconut = this.add.sprite(xPos, 400, "coconutButton").setInteractive();
+            const coconut = this.scene.add.sprite(xPos, 400, "coconutButton").setInteractive();
             coconut.setDepth(11);
             coconut.setData('value', ResultData.gameData.BonusResult[index]); // Assign the value from the array
             coconut.on('pointerdown', () => this.handleCoconutClick(coconut, xPos, 400)); // Add click handler
             this.coconutObjects.push(coconut);
-            const sprite = this.add.sprite(xPos, 400, 'Bail0'); // Start with the first sprite
+            const sprite = this.scene.add.sprite(xPos, 400, 'Bail0'); // Start with the first sprite
             this.spriteObjects.push(sprite);
         });
 
+        this.add(this.spriteObjects)
+        this.add(this.coconutObjects);
         this.createTweenAnimation();
+
     }
 
     private createTweenAnimation(): void {
-        this.tweens.addCounter({
+        this.scene.tweens.addCounter({
             from: 0,
             to: this.spriteNames.length - 1,
             duration: 1500, // Duration for each frame change (adjust as needed)
@@ -87,13 +84,13 @@ export default class BonusScene extends Scene {
         this.winamountText.setText(this.totalWinAmount.toString());
         coconut.destroy();
 
-        const animSprite = this.add.sprite(x, y, this.coconutAnims[0]).setDepth(12); // Start with the first frame
+        const animSprite = this.scene.add.sprite(x, y, this.coconutAnims[0]).setDepth(12); // Start with the first frame
 
         // Track the last position for the text
         let finalFramePosition = { x, y };
-        this.SoundManager.playSound("coconutFall");
+        this.soundManager.playSound("coconutFall");
         // Tween animation to cycle through frames
-        this.tweens.addCounter({
+        this.scene.tweens.addCounter({
             from: 0,
             to: this.coconutAnims.length - 1,
             duration: 1500, // Duration for each frame change (adjust as needed)
@@ -105,20 +102,19 @@ export default class BonusScene extends Scene {
             },
             onComplete: () => {
                 // Display the text at the last frame's position
-                let text = this.add.text(finalFramePosition.x, finalFramePosition.y + 380, `+${valueText}`, { font: "50px Arial", color: "#fff" }).setOrigin(0.5)
-                if(value === 0){
+                let text = this.scene.add.text(finalFramePosition.x, finalFramePosition.y + 380, `+${valueText}`, { font: "50px Arial", color: "#fff" }).setOrigin(0.5)
+                if (value === 0) {
                     text.destroy();
-                    text = this.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", { font: "40px Arial", color: "#fff"}).setOrigin(0.5)
-                    setTimeout(() => { 
+                    text = this.scene.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", { font: "40px Arial", color: "#fff" }).setOrigin(0.5)
+                    setTimeout(() => {
                         currentGameData.bonusOpen = false
-                        this.events.emit("bonusStateChanged", false);
-                        this.SoundManager.pauseSound("bonusBg")
-                        Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
+                        this.soundManager.pauseSound("bonusBg")
+                        this.scene.events.emit('closePopup');
                     }, 2000);
-                }else{
-                    this.SoundManager.playSound("bonuswin");
+                } else {
+                    this.soundManager.playSound("bonuswin");
                 }
-                this.tweens.add({
+                this.scene.tweens.add({
                     targets: text,
                     alpha: 0, // Fade out text
                     duration: 1000,
@@ -136,8 +132,7 @@ export default class BonusScene extends Scene {
     spinWheel() {
         setTimeout(() => {
             currentGameData.bonusOpen = false
-            this.events.emit("bonusStateChanged", false);
-            Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
+            this.scene.events.emit('closePopup')
         }, 2000);
     }
 }

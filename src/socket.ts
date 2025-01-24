@@ -1,13 +1,15 @@
 import { io } from "socket.io-client";
 import { Globals, ResultData, initData, gambleData, gambleResult } from "./scripts/Globals";
 import MainLoader from "./view/MainLoader";
-import Disconnection from "./scripts/Disconecction";
+import { Popupmanager } from "./scripts/PopupManager";
+import { Scene } from "phaser";
 
 let counter = 0
 
 
 // const socketUrl = process.env.SOCKET_URL || ""
 export class SocketManager {
+  popupManager!: Popupmanager
   public socket : any;
   public authToken : string = "";
   public SocketUrl : string= "";
@@ -52,9 +54,7 @@ export class SocketManager {
       console.log("Connected to the server");
       this.socket.on("message", (message : any) => {
         const data = JSON.parse(message);
-        // console.log(`Message ID : ${data.id} |||||| Message Data : ${JSON.stringify(data.message)}`);
-        console.log("Message ID", data);
-        
+        // console.log(`Message ID : ${data.id} |||||| Message Data : ${JSON.stringify(data.message)}`);        
         if(data.id == "InitData" ) {
           if(initData.gameData.Bets.length != 0){
             initData.UIData.symbols = data.message.UIData.payLines.symbol
@@ -64,6 +64,7 @@ export class SocketManager {
             initData.playerData = data.message.PlayerData;
             initData.UIData.symbols = data.message.UIData.paylines.symbols
             initData.gameData.BonusData = data.message.BonusData;
+            ResultData.playerData.Balance = data.message.PlayerData.Balance;
             console.log(data, "initData on Socket File");
             Globals.SceneHandler?.addScene("MainLoader", MainLoader, true)
           }
@@ -76,6 +77,7 @@ export class SocketManager {
               ResultData.playerData = data.message.PlayerData;
               Globals.emitter?.Call("ResultData");
               console.log(ResultData);
+              console.log(ResultData.gameData.isBonus, "Bonus");
         }
         if(data.id == "gambleInitData"){
           gambleData.gambleCards = data.message
@@ -99,7 +101,8 @@ export class SocketManager {
     this.socket.on("disconnect", (reason: string) => {
       console.log("Disconnected from the server. Reason:", reason);
       setTimeout(() => {
-        Globals.SceneHandler?.addScene("Disconnection", Disconnection, true)
+        // this.popupManager.showDisconnectionPopup()
+        // Globals.SceneHandler?.addScene("Disconnection", Disconnection, true)
       }, 2000)
     });
     this.socket.on("reconnect_attempt", (attemptNumber: number) => {

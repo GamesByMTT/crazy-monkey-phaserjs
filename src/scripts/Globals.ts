@@ -88,6 +88,7 @@ export const currentGameData = {
   currentBalance: 0,
   isMoving: false,
   gambleOpen: false,
+  bonusOpen: false,
   isAutoSpin: false,
   turboMode: false,
   stopButtonEnabled: false

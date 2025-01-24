@@ -3,9 +3,10 @@ import { Globals, ResultData, currentGameData, initData } from "./Globals";
 import { gameConfig } from './appconfig';
 import { UiContainer } from './UiContainer';
 import SoundManager from './SoundManager';
-import Disconnection from './Disconecction';
+import { Popupmanager } from './PopupManager';
 export class Slots extends Phaser.GameObjects.Container {
     slotMask: Phaser.GameObjects.Graphics;
+    popupManager: Popupmanager
     SoundManager: SoundManager
     slotSymbols: any[][] = [];
     moveSlots: boolean = false;
@@ -31,6 +32,7 @@ export class Slots extends Phaser.GameObjects.Container {
         this.resultCallBack = callback;
         this.uiContainer = uiContainer;
         this.SoundManager = SoundManager
+        this.popupManager = new Popupmanager(this.scene)
         this.slotMask = new Phaser.GameObjects.Graphics(scene);
 
         this.maskWidth = gameConfig.scale.width / 1.8;
@@ -231,7 +233,7 @@ export class Slots extends Phaser.GameObjects.Container {
     }
 
     showDisconnectionScene() {
-        Globals.SceneHandler?.addScene("Disconnection", Disconnection, true)
+        this.popupManager.showDisconnectionPopup()
     }
 
 
@@ -261,7 +263,7 @@ export class Slots extends Phaser.GameObjects.Container {
                 this.freeSpinTimer.remove();
                 this.freeSpinTimer = null;
             }
-            if (currentGameData.gambleOpen) {
+            if (currentGameData.gambleOpen || currentGameData.bonusOpen) {
                 // Set flag to indicate pending freeSpin
                 this.pendingFreeSpin = true;
             } else {
@@ -292,7 +294,7 @@ export class Slots extends Phaser.GameObjects.Container {
         }
         
         this.freeSpinTimer = this.scene.time.delayedCall(2000, () => {
-            if (!currentGameData.gambleOpen) {  // Only proceed if bonus isn't open
+            if (!currentGameData.gambleOpen || currentGameData.bonusOpen) {  // Only proceed if bonus isn't open
                 this.scene.events.emit("freeSpin");
                 this.pendingFreeSpin = false;
                 this.freeSpinTimer = null;
@@ -367,8 +369,6 @@ class Symbols {
         }
     }
     playAnimation(animationId: any) {
-        console.log(animationId, "animationId", this.symbol, "this.symbol");
-        
         this.symbol.play(animationId)
     }
     stopAnimation() {
@@ -393,7 +393,7 @@ class Symbols {
                 this.scene.anims.create({
                     key: `symbol_anim_${elementId}`,
                     frames: textureKeys.map(key => ({ key })),
-                    frameRate: 20,
+                    frameRate: 30,
                     repeat: -1
                 });
                 // Set the texture to the first key and start the animation

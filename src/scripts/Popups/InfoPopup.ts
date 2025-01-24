@@ -15,7 +15,6 @@ export class InfoPopup extends GameObjects.Container {
     pages: Phaser.GameObjects.Container[] = [];
     constructor(scene: Scene, data: any) {
         super(scene);
-        const { width, height } = this.scene.cameras.main
         // this.SceneBg = new Phaser.GameObjects.Sprite(this.scene, width / 2, height / 2, 'Background')
         //     .setDisplaySize(width, height)
         //     .setDepth(11)

@@ -3,12 +3,14 @@ import { GamblePopup } from "./Popups/GamblePopup";
 import { LogoutPopup } from "./Popups/LogoutPopup";
 import { SettingPopup } from "./Popups/SettingPopup";
 import { InfoPopup } from "./Popups/InfoPopup";
+import { DisconnectionPopup } from "./Popups/disconnection";
+import { BonusPopup } from "./Popups/BonusPopup";
 
 export class Popupmanager{
     private scene: Scene
     private popupContainer: Phaser.GameObjects.Container
     private overLay: Phaser.GameObjects.Rectangle
-    private currentPopup: InfoPopup | SettingPopup | LogoutPopup | GamblePopup | null = null
+    private currentPopup: InfoPopup | SettingPopup | LogoutPopup | GamblePopup | DisconnectionPopup |  null = null
 
     constructor(scene: Scene){
         this.scene = scene
@@ -17,10 +19,6 @@ export class Popupmanager{
 
         // Create dark overlay
         this.overLay = scene.add.rectangle(0, 0, scene.scale.width,  scene.scale.height, 0x000000, 0.7).setOrigin(0).setDepth(0).setInteractive();
-        // this.overLay.setOrigin(0);
-        // this.overLay.setInteractive();
-        // this.overLay.setDepth(0)
-
         //close all popup if click anywhere on the screen
         this.overLay.on("pointerdown",()=>{
             scene.events.emit("closePopup")
@@ -53,9 +51,16 @@ export class Popupmanager{
         this.popupContainer.setVisible(true)
     }
 
-    showGamblePopup(){
+    showGamblePopup(config: { onClose?: () => void }){
         this.closeCurrentPopup();
         this.currentPopup = new GamblePopup(this.scene, this)
+        this.popupContainer.add(this.currentPopup)
+        this.popupContainer.setVisible(true)
+    }
+
+    showDisconnectionPopup(){
+        this.closeCurrentPopup();
+        this.currentPopup = new DisconnectionPopup(this.scene)
         this.popupContainer.add(this.currentPopup)
         this.popupContainer.setVisible(true)
     }
