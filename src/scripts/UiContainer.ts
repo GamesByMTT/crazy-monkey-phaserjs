@@ -52,6 +52,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.stopSpinButton()
         this.autoSpinBtnInit(spinCallBack);
         this.lineBtnInit();
+        this.doubleButtonInit()
         this.winBtnInit();
         this.balanceBtnInit();
         this.BetBtnInit();
@@ -59,6 +60,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.settingBtnInit();
         this.infoButton();
         this.turboButton()
+      
         
         this.SoundManager = soundManager;
         this.scene.events.on("updateWin", this.updateData, this)
@@ -292,6 +294,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
 
     freeSpinStart(spinCallBack: () => void){
         currentGameData.gambleOpen = false
+        currentGameData.popupOpen = false
         currentGameData.bonusOpen = false;
         if(currentGameData.isAutoSpin || ResultData.gameData.freeSpins.count > 0){
             if(ResultData.gameData.freeSpins.count > 0){
@@ -355,6 +358,25 @@ export class UiContainer extends Phaser.GameObjects.Container {
         return button;
     }
    
+    doubleButtonInit(){
+        const container = this.scene.add.container(gameConfig.scale.width / 2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.7)
+        this.doubleButton = this.scene.add.sprite(0, 0, "doubleButton").disableInteractive()
+        this.doubleButton.on("pointerdown", ()=>{
+            currentGameData.gambleOpen = true;
+            currentGameData.popupOpen = true;
+            Globals.Socket?.sendMessage("GambleInit", { id: "GambleInit", GAMBLETYPE: "HIGHCARD" });
+            // this.popupManager.showGamblePopup()
+            this.popupManager.showGamblePopup({
+                onClose: () => {
+                    currentGameData.gambleOpen = false;
+                    currentGameData.popupOpen = false
+                    this.scene.events.emit("bonusStateChanged", false);
+                }
+            });
+        })
+
+        container.add(this.doubleButton)
+    }
    
 
     onSpin(spin: boolean) {
@@ -393,53 +415,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
     buttonMusic(key: string){
         this.SoundManager.playSound(key)
     }
-    update() {
-        // Check the value of this.currentWiningText.text
-        if (parseFloat(this.currentWiningText.text) > 0) {
-            // If doubleButton does not exist, create it
-            if (!this.doubleButton || this.doubleButton.scene == undefined) {
-                this.doubleButton = this.createButton('doubleButton', gameConfig.scale.width / 2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9, () => {
-                    currentGameData.gambleOpen = true;
-                    Globals.Socket?.sendMessage("GambleInit", { id: "GambleInit", GAMBLETYPE: "HIGHCARD" });
-                    // this.popupManager.showGamblePopup()
-                    this.popupManager.showGamblePopup({
-                        onClose: () => {
-                            currentGameData.gambleOpen = false;
-                            this.scene.events.emit("bonusStateChanged", false);
-                        }
-                    });
-                });
-    
-                // Start tween for scaling up and down continuously
-                this.scene.tweens.add({
-                    targets: this.doubleButton,
-                    scaleX: 1.1,
-                    scaleY: 1.1,
-                    duration: 500,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: 'Sine.easeInOut'
-                });
-
-                // this.scene.tweens.add({
-                //     targets:  this.currentWiningText,
-                //     scaleX: 1.3, 
-                //     scaleY: 1.3, 
-                //     duration: 500, // Duration of the scale effect
-                //     yoyo: true, 
-                //     repeat: -1, 
-                //     ease: 'Sine.easeInOut' // Easing function
-                // });
-            }
-        } else {
-            // If currentWiningText.text is 0 and doubleButton exists, destroy it
-            if (this.doubleButton) {
-                // Stop all tweens associated with doubleButton
-                this.scene.tweens.killTweensOf(this.doubleButton);
-                this.doubleButton.destroy();               
-            }
-        }
-    }
+  
 
     exitButton(){
         this.exitBtn =  new Phaser.GameObjects.Sprite(this.scene, 0, 0, 'crossButton');
@@ -530,6 +506,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
             },
             onComplete: () => {
                 this.currentBalanceText.updateLabelText(endValue.toFixed(3).toString());
+                
             }
         });
 
@@ -550,18 +527,32 @@ export class UiContainer extends Phaser.GameObjects.Container {
             onComplete: () => {
                 // Ensure final value is exact
                 this.currentWiningText.updateLabelText(winendValue.toFixed(3).toString());
+                if(winendValue > 0){
+                    this.doubleButton.setInteractive()
+                    this.scene.tweens.add({
+                        targets: this.doubleButton,
+                        scaleX: { from: 1, to: 1.2 },  // Start from 1, go to 1.2
+                        scaleY: { from: 1, to: 1.2 },  // Start from 1, go to 1.2
+                        duration: 500,                  // Half a second for each direction
+                        yoyo: true,                     // Makes it go back and forth
+                        repeat: -1,                     // Infinite repeat
+                        ease: 'Sine.easeInOut'         // Smooth transition
+                    });
+                }else{
+                    if (this.doubleButton) {
+                        // Stop all tweens associated with doubleButton
+                        this.scene.tweens.killTweensOf(this.doubleButton);
+                        this.doubleButton.disableInteractive();               
+                    }
+                }
+                
             }
         });
        
         if (ResultData.gameData.isBonus) {
             currentGameData.bonusOpen = true;
+            currentGameData.popupOpen = true
             this.scene.events.emit("bonusStateChanged", true);
-            // this.popupManager.showBonusPopup({
-            //     onClose: () => {
-            //         currentGameData.bonusOpen = false;
-            //         this.scene.events.emit("bonusStateChanged", false);
-            //     }
-            // });
         }
     }
 
@@ -604,5 +595,4 @@ export class UiContainer extends Phaser.GameObjects.Container {
             this.stopButton.setVisible(false)
         }, 500);
     }
-    
 }

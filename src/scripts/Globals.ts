@@ -91,7 +91,9 @@ export const currentGameData = {
   bonusOpen: false,
   isAutoSpin: false,
   turboMode: false,
-  stopButtonEnabled: false
+  stopButtonEnabled: false,
+  pendingFreeSpin: false,
+  popupOpen: false
 };
 
 export const ResultData = {

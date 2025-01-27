@@ -108,6 +108,7 @@ export class BonusPopup extends Phaser.GameObjects.Container {
                     text = this.scene.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", { font: "40px Arial", color: "#fff" }).setOrigin(0.5)
                     setTimeout(() => {
                         currentGameData.bonusOpen = false
+                        currentGameData.popupOpen = false
                         this.soundManager.pauseSound("bonusBg")
                         this.scene.events.emit('closePopup');
                     }, 2000);
@@ -129,10 +130,4 @@ export class BonusPopup extends Phaser.GameObjects.Container {
         });
     }
 
-    spinWheel() {
-        setTimeout(() => {
-            currentGameData.bonusOpen = false
-            this.scene.events.emit('closePopup')
-        }, 2000);
-    }
 }

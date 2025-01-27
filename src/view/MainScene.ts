@@ -122,7 +122,8 @@ export default class MainScene extends Scene {
                 if (ResultData.gameData.isBonus) {
                     this.soundManager.pauseSound("backgroundMusic");
                     setTimeout(() => {
-                        currentGameData.bonusOpen = true
+                        //currentGameData.bonusOpen = true
+                       // this.events.emit("bonusStateChanged", false);
                         Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
                     }, 600);
                 }         
@@ -131,7 +132,7 @@ export default class MainScene extends Scene {
                 let betValue = (initData.gameData.Bets[currentGameData.currentBetIndex]) * 20
                 let jackpot = ResultData.gameData.jackpot
                 let winAmount = ResultData.gameData.WinAmout;   
-                this.uiContainer.currentBalanceText.updateLabelText(currentGameData.currentBalance.toFixed(2));
+                // this.uiContainer.currentBalanceText.updateLabelText(currentGameData.currentBalance.toFixed(2));
                 const freeSpinCount = ResultData.gameData.freeSpins.count;
                 // const freeSpinCount = 5;
                 // Check if freeSpinCount is greater than 1

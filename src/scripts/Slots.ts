@@ -265,7 +265,7 @@ export class Slots extends Phaser.GameObjects.Container {
             }
             if (currentGameData.gambleOpen || currentGameData.bonusOpen) {
                 // Set flag to indicate pending freeSpin
-                this.pendingFreeSpin = true;
+                currentGameData.pendingFreeSpin = true;
             } else {
                 this.scene.time.delayedCall(hasWinningSymbols ? 3000 : 1500, () => {
                     this.scheduleFreeSpinTimer();
@@ -275,45 +275,31 @@ export class Slots extends Phaser.GameObjects.Container {
         this.scene.events.emit("feeSpinPopup")
         this.scene.events.emit("updateWin");
     }
-
-    // private scheduleFreeSpinTimer() {
-    //     if (this.freeSpinTimer) {
-    //         this.freeSpinTimer.remove();
-    //     }
-
-    //     // Create a new timer with 3000ms (3 seconds) delay
-    //     this.freeSpinTimer = this.scene.time.delayedCall(3000, () => {
-    //         this.scene.events.emit("freeSpin");
-    //         this.pendingFreeSpin = false;
-    //         this.freeSpinTimer = null;
-    //     });
-    // }
     private scheduleFreeSpinTimer() {
         if (this.freeSpinTimer) {
             this.freeSpinTimer.remove();
         }
         
         this.freeSpinTimer = this.scene.time.delayedCall(2000, () => {
-            if (!currentGameData.gambleOpen || currentGameData.bonusOpen) {  // Only proceed if bonus isn't open
+            if (!currentGameData.popupOpen && !currentGameData.gambleOpen || !currentGameData.popupOpen && !currentGameData.bonusOpen) {  // Only proceed if bonus isn't open
                 this.scene.events.emit("freeSpin");
-                this.pendingFreeSpin = false;
+                currentGameData.pendingFreeSpin = false;
                 this.freeSpinTimer = null;
             }
         });
     }
 
     private handleBonusStateChange(isOpen: boolean) {
-
         if (isOpen) {
             // Pause/remove timer if bonus opens
             if (this.freeSpinTimer) {
                 this.freeSpinTimer.remove();
                 this.freeSpinTimer = null;
             }
-            this.pendingFreeSpin = true;
+            currentGameData.pendingFreeSpin = true;
         } else {
             // Resume timer if bonus closes and we have a pending freeSpin
-            if (this.pendingFreeSpin && (ResultData.gameData.freeSpins.count > 0 || currentGameData.isAutoSpin)) {
+            if (currentGameData.pendingFreeSpin && (ResultData.gameData.freeSpins.count > 0 || currentGameData.isAutoSpin)) {
                 this.scheduleFreeSpinTimer();
             }
         }

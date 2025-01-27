@@ -73,8 +73,12 @@ export class GamblePopup extends Phaser.GameObjects.Container {
             this.flipCard(this.DealerCard, gambleData.gambleCards.highCard);
             this.flipCard(this.backCards[clickedIndex], gambleData.gambleCards.lowCard);
             setTimeout(() => {
+                currentGameData.pendingFreeSpin = true;
                 currentGameData.gambleOpen = false;
+                currentGameData.popupOpen = false
+                this.scene.events.emit("bonusStateChanged", false);
                 Globals.Socket?.sendMessage("GAMBLECOLLECT", { id: "GamleCollect" });
+                
                 this.scene.events.emit('closePopup')
             }, 2000);
 
@@ -87,7 +91,10 @@ export class GamblePopup extends Phaser.GameObjects.Container {
             this.doubleButtonText = this.scene.add.text(this.doubleButton.x - 80, this.doubleButton.y - 20, "DOUBLE", { fontSize: '40px', fontFamily: 'Arial', color: "#ffffff" });
             this.collectButtonText = this.scene.add.text(this.collecButton.x - 85, this.collecButton.y - 20, "COLLECT", { fontSize: '40px', fontFamily: 'Arial', color: "#ffffff" })
             this.collecButton.on('pointerdown', () => {
+                currentGameData.pendingFreeSpin = true;
                 currentGameData.gambleOpen = false;
+                currentGameData.popupOpen = false;
+                this.scene.events.emit("bonusStateChanged", false);
                 Globals.Socket?.sendMessage("GAMBLECOLLECT", { id: "GamleCollect" });
                 this.scene.events.emit('closePopup')
             });
@@ -106,7 +113,6 @@ export class GamblePopup extends Phaser.GameObjects.Container {
 
     updateCurrentWinningText() {
         let winAmount = gambleResult.gamleResultData.currentWining
-        console.log(winAmount, "new winnning");
         this.currentWinningText.setText(`${winAmount}`);
     }
 

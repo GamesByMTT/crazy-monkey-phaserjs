@@ -77,7 +77,6 @@ export class SocketManager {
               ResultData.playerData = data.message.PlayerData;
               Globals.emitter?.Call("ResultData");
               console.log(ResultData);
-              console.log(ResultData.gameData.isBonus, "Bonus");
         }
         if(data.id == "gambleInitData"){
           gambleData.gambleCards = data.message

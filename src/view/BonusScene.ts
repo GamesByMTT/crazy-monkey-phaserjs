@@ -7,6 +7,7 @@ export default class BonusScene extends Scene {
     SoundManager!: SoundManager;  // Declare the type
     SceneBg!: Phaser.GameObjects.Sprite;
     winBg!: Phaser.GameObjects.Sprite;
+    noteBg!: Phaser.GameObjects.Sprite
     private spriteObjects: Phaser.GameObjects.Sprite[] = [];
     private spriteNames: string[] = [];
     private coconutObjects: Phaser.GameObjects.Sprite[] = [];
@@ -33,16 +34,18 @@ export default class BonusScene extends Scene {
             pointer.event.stopPropagation();
         })
         this.winBg = new Phaser.GameObjects.Sprite(this, width * 0.9, height / 2.1, "winBg");
+        this.noteBg = new Phaser.GameObjects.Sprite(this, width * 0.11, height * 0.5, "noteBox").setDisplaySize(350, 230)
+        const noteText = this.add.text(this.noteBg.x, this.noteBg.y, `TAP ON THE ROPES TO \nREVEAL YOUR PRIZE UNTILL \nIT'S GAMEOVER`, { fontSize: '28px', color: "#ffffff", align: 'center', fontFamily:"Poplar" }).setOrigin(0.5);
         
         // let winamount = this.add.text(width * 0.895, height / 2, ResultData.gameData.WinAmout.toString(), { font: "40px Arial", color: "#fff" });
         this.winamountText = this.add.text(width * 0.9, height / 2, this.totalWinAmount.toString(), { font: "40px Arial", color: "#fff",  align: 'center',  }).setOrigin(0.5);
-        this.bonusContainer.add([this.SceneBg, this.winBg, this.winamountText]);
+        this.bonusContainer.add([this.SceneBg, this.winBg, this.winamountText, this.noteBg, noteText]);
 
         // Initialize sprite names and animations
-        for (let i = 0; i <= 29; i++) {
+        for (let i = 0; i < 30; i++) {
             this.spriteNames.push(`Bail${i}`);
         }
-        for (let j = 0; j <= 47; j++) {
+        for (let j = 0; j < 48; j++) {
             this.coconutAnims.push(`coconutAnim${j}`);
         }
 
@@ -51,14 +54,24 @@ export default class BonusScene extends Scene {
 
         // Create coconut sprites and set up interactivity
         xPositions.forEach((xPos: number, index: number) => {
-            const coconut = this.add.sprite(xPos, 400, "coconutButton").setInteractive();
-            coconut.setDepth(11);
-            coconut.setData('value', ResultData.gameData.BonusResult[index]); // Assign the value from the array
-            coconut.on('pointerdown', () => this.handleCoconutClick(coconut, xPos, 400)); // Add click handler
-            this.coconutObjects.push(coconut);
-            const sprite = this.add.sprite(xPos, 400, 'Bail0'); // Start with the first sprite
+            const sprite = this.add.sprite(xPos, 400, 'Bail0')
+                .setInteractive()
+                .setDepth(10); // Make sure bail is below coconut
             this.spriteObjects.push(sprite);
-        });
+            
+            const coconut = this.add.sprite(xPos, 400, "coconutButton")
+                .setInteractive()
+                .setVisible(false)
+                .setDepth(11);
+                
+            coconut.setData('value', ResultData.gameData.BonusResult[index]);
+            
+            sprite.on('pointerdown', () => {
+                this.handleCoconutClick(coconut, xPos, 400, sprite);
+            });
+            
+            this.coconutObjects.push(coconut);
+            });
 
         this.createTweenAnimation();
     }
@@ -67,77 +80,82 @@ export default class BonusScene extends Scene {
         this.tweens.addCounter({
             from: 0,
             to: this.spriteNames.length - 1,
-            duration: 1500, // Duration for each frame change (adjust as needed)
-            repeat: -1, // Loop indefinitely
+            duration: 1500,
+            repeat: -1,
             onUpdate: (tween: Phaser.Tweens.Tween) => {
                 const frameIndex = Math.floor(tween.getValue());
-                // Update the texture of each sprite with the corresponding frame
+                // Only update sprites that still exist
                 this.spriteObjects.forEach(sprite => {
-                    sprite.setTexture(this.spriteNames[frameIndex]);
+                    if (sprite && sprite.scene) {  // Check if sprite still exists
+                        sprite.setTexture(this.spriteNames[frameIndex]);
+                    }
                 });
             }
         });
     }
 
-    private handleCoconutClick(coconut: Phaser.GameObjects.Sprite, x: number, y: number): void {
+    private handleCoconutClick(coconut: Phaser.GameObjects.Sprite, x: number, y: number, bailSprite: Phaser.GameObjects.Sprite): void {
+
+        const index = this.spriteObjects.indexOf(bailSprite);
+        if (index > -1) {
+            this.spriteObjects.splice(index, 1);
+        }
+        // Immediately disable interaction to prevent multiple clicks
+        bailSprite.disableInteractive();
         const valueText = coconut.getData('value');
         const value = parseInt(coconut.getData('value'))
         this.totalWinAmount += value;
-        // Remove the clicked coconut sprite
         this.winamountText.setText(this.totalWinAmount.toString());
         coconut.destroy();
-
-        const animSprite = this.add.sprite(x, y, this.coconutAnims[0]).setDepth(12); // Start with the first frame
-
-        // Track the last position for the text
+        bailSprite.destroy();
+        
+        const animSprite = this.add.sprite(x, y, this.coconutAnims[0]).setDepth(12);
+        
         let finalFramePosition = { x, y };
         this.SoundManager.playSound("coconutFall");
-        // Tween animation to cycle through frames
+        
         this.tweens.addCounter({
             from: 0,
             to: this.coconutAnims.length - 1,
-            duration: 1500, // Duration for each frame change (adjust as needed)
+            duration: 1500,
             onUpdate: (tween: Phaser.Tweens.Tween) => {
                 const frameIndex = Math.floor(tween.getValue());
                 animSprite.setTexture(this.coconutAnims[frameIndex]);
-                // Update final frame position if needed
                 finalFramePosition = { x: animSprite.x, y: animSprite.y };
             },
             onComplete: () => {
-                // Display the text at the last frame's position
-                let text = this.add.text(finalFramePosition.x, finalFramePosition.y + 380, `+${valueText}`, { font: "50px Arial", color: "#fff" }).setOrigin(0.5)
+                let text = this.add.text(finalFramePosition.x, finalFramePosition.y + 380, `+${valueText}`, 
+                    { font: "50px Arial", color: "#fff" }).setOrigin(0.5);
+                
                 if(value === 0){
                     text.destroy();
-                    text = this.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", { font: "40px Arial", color: "#fff"}).setOrigin(0.5)
+                    text = this.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", 
+                        { font: "40px Arial", color: "#fff"}).setOrigin(0.5);
+                        
                     setTimeout(() => { 
+                        this.SoundManager.pauseSound("bonusBg");
                         currentGameData.bonusOpen = false
-                        this.events.emit("bonusStateChanged", false);
-                        this.SoundManager.pauseSound("bonusBg")
-                        Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
+                        currentGameData.popupOpen = false
+                        const mainScene = this.scene.get("MainScene")
+                        console.log("mainscene", mainScene);
+                        mainScene.events.emit("bonusStateChanged", false)
+                        // this.events.emit("bonusStateChanged", false);
+                        Globals.SceneHandler?.removeScene("BonusScene");
                     }, 2000);
-                }else{
+                } else {
                     this.SoundManager.playSound("bonuswin");
                 }
+        
                 this.tweens.add({
                     targets: text,
-                    alpha: 0, // Fade out text
+                    alpha: 0,
                     duration: 1000,
-                    delay: 1000, // Wait for the animation to complete
+                    delay: 1000,
                     onComplete: () => {
-                        // if(text == "Game Over")
-                        text.destroy(); // Remove the text after animation completes
+                        text.destroy();
                     }
                 });
-                // animSprite.destroy(); // Clean up after animation
             }
         });
-    }
-
-    spinWheel() {
-        setTimeout(() => {
-            currentGameData.bonusOpen = false
-            this.events.emit("bonusStateChanged", false);
-            Globals.SceneHandler?.removeScene("BonusScene"); // Remove or transition out of the scene
-        }, 2000);
     }
 }
