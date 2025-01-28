@@ -15,6 +15,7 @@ export class GamblePopup extends Phaser.GameObjects.Container {
     isGambleResultRequested: boolean = false; // Flag to ensure the message is sent only once
     doubleButtonText!: Phaser.GameObjects.Text
     collectButtonText!: Phaser.GameObjects.Text
+    noteBg!: Phaser.GameObjects.Sprite
     constructor(scene: Scene, data: any) {
         super(scene);
         this.backCards = []; // Initialize the back cards array
@@ -28,8 +29,11 @@ export class GamblePopup extends Phaser.GameObjects.Container {
             pointer.event.stopPropagation();
         });
 
-        this.winBg = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width / 2, gameConfig.scale.height / 1.2, "winBg");
+        this.winBg = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width / 2, gameConfig.scale.height / 1.2, "winPanel");
         this.DealerCard = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width * 0.15, gameConfig.scale.height / 2, "BackCard1");
+        this.noteBg = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width * 0.5, gameConfig.scale.height * 0.2, "noteBox").setDisplaySize(500, 190) .setOrigin(0.5)
+        const noteText = this.scene.add.text(gameConfig.scale.width * 0.5, gameConfig.scale.height * 0.2, "PICK ONE OF THE THREE CARDS TO \nCHALLENGE DEALER", {fontFamily: "Poplar", color: "#FFFFFF", fontSize: 35, align:"center"}).setOrigin(0.5)
+        const dealerText = this.scene.add.text(gameConfig.scale.width * 0.15, gameConfig.scale.height * 0.75, "DEALER", {fontFamily: "Poplar", color: "#ffff00", fontSize: 60}).setOrigin(0.5)
 
         // Create back cards and add them to the array
         this.backCards.push(
@@ -41,12 +45,12 @@ export class GamblePopup extends Phaser.GameObjects.Container {
         this.currentWinningText = this.scene.add.text(
             this.winBg.x, this.winBg.y + 25, // Position over winBg
             `${ResultData.playerData.currentWining}`, // Initial text
-            { fontSize: '40px', color: '#ffffff' } // Styling
+            { fontSize: 50, color: '#ffff00', fontFamily: "Poplar" } // Styling
         ).setOrigin(0.5); // Center the text
         this.add([
             this.SceneBg, this.winBg, this.DealerCard,
             ...this.backCards,
-            this.currentWinningText // Add the text to the container
+            this.currentWinningText, this.noteBg, noteText, dealerText // Add the text to the container
         ]);
     }
 
@@ -59,7 +63,15 @@ export class GamblePopup extends Phaser.GameObjects.Container {
                 this.isGambleResultRequested = true; // Set the flag to true
                 Globals.Socket?.sendMessage("GambleResultData", { id: "GambleInit", GAMBLETYPE: "HIGHCARD" });
                 setTimeout(() => {
+                    if(this.doubleButton){
+                            this.doubleButton.setVisible(false)
+                            this.collecButton.setVisible(false);
+                            this.doubleButtonText.destroy()
+                            this.collectButtonText.destroy()
+                    }
+                    
                     this.handleGambleResult(index);
+
                 }, 300);
 
             }
@@ -72,13 +84,21 @@ export class GamblePopup extends Phaser.GameObjects.Container {
         if (!gambleResult.gamleResultData.playerWon) {
             this.flipCard(this.DealerCard, gambleData.gambleCards.highCard);
             this.flipCard(this.backCards[clickedIndex], gambleData.gambleCards.lowCard);
+            if(this.doubleButton){
+                this.doubleButton.setVisible(false)
+                this.collecButton.setVisible(false);
+                this.doubleButtonText.destroy()
+                this.collectButtonText.destroy()
+            }
+            
             setTimeout(() => {
                 currentGameData.pendingFreeSpin = true;
                 currentGameData.gambleOpen = false;
                 currentGameData.popupOpen = false
                 this.scene.events.emit("bonusStateChanged", false);
                 Globals.Socket?.sendMessage("GAMBLECOLLECT", { id: "GamleCollect" });
-                
+                currentGameData.gambleState = false
+                this.scene.events.emit("updateWin")
                 this.scene.events.emit('closePopup')
             }, 2000);
 
@@ -94,8 +114,11 @@ export class GamblePopup extends Phaser.GameObjects.Container {
                 currentGameData.pendingFreeSpin = true;
                 currentGameData.gambleOpen = false;
                 currentGameData.popupOpen = false;
+                currentGameData.gambleState = false
                 this.scene.events.emit("bonusStateChanged", false);
+                
                 Globals.Socket?.sendMessage("GAMBLECOLLECT", { id: "GamleCollect" });
+                this.scene.events.emit("updateWin")
                 this.scene.events.emit('closePopup')
             });
 

@@ -246,10 +246,26 @@ export class Slots extends Phaser.GameObjects.Container {
                 if (typeof row === "string") {
                     hasWinningSymbols = true;
                     const [y, x]: number[] = row.split(",").map((value) => parseInt(value));
-                    const animationId = `symbol_anim_${ResultData.gameData.ResultReel[x][y]}`;
-                    if (this.slotSymbols[y] && this.slotSymbols[y][x]) {
-                        this.winMusic("winMusic");
-                        this.slotSymbols[y][x].playAnimation(animationId);
+                    const symbolId = ResultData.gameData.ResultReel[x][y];
+                    
+                    // Check if the symbol ID is between 0 and 8
+                    if (symbolId >= 0 && symbolId <= 8) {
+                        // Create animation key for symbols 0-8
+                        const animationId = `symbol_anim_${symbolId}_special`;
+                        
+                        if (this.slotSymbols[y] && this.slotSymbols[y][x]) {
+                            this.winMusic("winMusic");
+                            // Play special animation for symbols 0-8
+                            this.slotSymbols[y][x].playSpecialAnimation(symbolId);
+                        }
+                    } else {
+                        // Use existing animation for other symbols
+                        const animationId = `symbol_anim_${symbolId}`;
+                        
+                        if (this.slotSymbols[y] && this.slotSymbols[y][x]) {
+                            this.winMusic("winMusic");
+                            this.slotSymbols[y][x].playAnimation(animationId);
+                        }
                     }
                 }
             });
@@ -354,6 +370,36 @@ class Symbols {
             return symbolKey; // Return the original key if format is incorrect
         }
     }
+
+    playSpecialAnimation(symbolId: number) {
+        // Create texture keys for special animation (1 to 20)
+        let textureKeys: string[] = [];
+        for (let i = 1; i <= 20; i++) {
+            const textureKey = `slots${symbolId}_${i}`;
+            if (this.scene.textures.exists(textureKey)) {
+                textureKeys.push(textureKey);
+            }
+        }
+   
+        // Create and play the special animation
+        if (textureKeys.length > 0) {
+            const animationKey = `symbol_anim_${symbolId}_special`;
+            
+            // Create the animation if it doesn't exist
+            if (!this.scene.anims.exists(animationKey)) {
+                this.scene.anims.create({
+                    key: animationKey,
+                    frames: textureKeys.map(key => ({ key })),
+                    frameRate: 20,
+                    repeat: -1
+                });
+            }
+   
+            // Play the animation
+            this.symbol.play(animationKey);
+        }
+    }
+
     playAnimation(animationId: any) {
         this.symbol.play(animationId)
     }
@@ -379,7 +425,7 @@ class Symbols {
                 this.scene.anims.create({
                     key: `symbol_anim_${elementId}`,
                     frames: textureKeys.map(key => ({ key })),
-                    frameRate: 30,
+                    frameRate: 20,
                     repeat: -1
                 });
                 // Set the texture to the first key and start the animation

@@ -35,7 +35,7 @@ export default class BonusScene extends Scene {
         })
         this.winBg = new Phaser.GameObjects.Sprite(this, width * 0.9, height / 2.1, "winBg");
         this.noteBg = new Phaser.GameObjects.Sprite(this, width * 0.11, height * 0.5, "noteBox").setDisplaySize(350, 230)
-        const noteText = this.add.text(this.noteBg.x, this.noteBg.y, `TAP ON THE ROPES TO \nREVEAL YOUR PRIZE UNTILL \nIT'S GAMEOVER`, { fontSize: '28px', color: "#ffffff", align: 'center', fontFamily:"Poplar" }).setOrigin(0.5);
+        const noteText = this.add.text(this.noteBg.x, this.noteBg.y, `TAP ON THE ROPES TO \nREVEAL YOUR PRIZE UNTILL \nIT'S GAMEOVER`, { fontSize: 30, color: "#ffffff", align: 'center', fontFamily:"Poplar" }).setOrigin(0.5);
         
         // let winamount = this.add.text(width * 0.895, height / 2, ResultData.gameData.WinAmout.toString(), { font: "40px Arial", color: "#fff" });
         this.winamountText = this.add.text(width * 0.9, height / 2, this.totalWinAmount.toString(), { font: "40px Arial", color: "#fff",  align: 'center',  }).setOrigin(0.5);
@@ -117,20 +117,20 @@ export default class BonusScene extends Scene {
         this.tweens.addCounter({
             from: 0,
             to: this.coconutAnims.length - 1,
-            duration: 1500,
+            duration: 1000,
             onUpdate: (tween: Phaser.Tweens.Tween) => {
                 const frameIndex = Math.floor(tween.getValue());
                 animSprite.setTexture(this.coconutAnims[frameIndex]);
                 finalFramePosition = { x: animSprite.x, y: animSprite.y };
             },
             onComplete: () => {
-                let text = this.add.text(finalFramePosition.x, finalFramePosition.y + 380, `+${valueText}`, 
-                    { font: "50px Arial", color: "#fff" }).setOrigin(0.5);
+                let text = this.add.text(finalFramePosition.x, finalFramePosition.y + 320, `+${valueText}`, 
+                    { fontSize: 50, color: "#fff", fontFamily:"Poplar" }).setOrigin(0.5);
                 
                 if(value === 0){
                     text.destroy();
-                    text = this.add.text(finalFramePosition.x, finalFramePosition.y + 360, "GameOver", 
-                        { font: "40px Arial", color: "#fff"}).setOrigin(0.5);
+                    text = this.add.text(finalFramePosition.x, finalFramePosition.y + 320, "GameOver", 
+                        { fontSize: 50, color: "#fff", fontFamily: "Poplar" }).setOrigin(0.5);
                         
                     setTimeout(() => { 
                         this.SoundManager.pauseSound("bonusBg");

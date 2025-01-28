@@ -15,14 +15,7 @@ export class InfoPopup extends GameObjects.Container {
     pages: Phaser.GameObjects.Container[] = [];
     constructor(scene: Scene, data: any) {
         super(scene);
-        // this.SceneBg = new Phaser.GameObjects.Sprite(this.scene, width / 2, height / 2, 'Background')
-        //     .setDisplaySize(width, height)
-        //     .setDepth(11)
-        //     .setInteractive();
-        // this.SceneBg.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-        //     pointer.event.stopPropagation();
-        // })
-
+      
         this.popupBackground = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width / 2, gameConfig.scale.height / 2, "PopupBackground").setScale(0.27);
         this.leftArrow = new Phaser.GameObjects.Sprite(this.scene, 300, gameConfig.scale.height / 2, "leftArrow").setInteractive();
         this.rightArrow = new Phaser.GameObjects.Sprite(this.scene, 1600, gameConfig.scale.height / 2, "rightArrow").setInteractive();
@@ -31,12 +24,10 @@ export class InfoPopup extends GameObjects.Container {
             this.scene.events.emit("closePopup")
         });
         this.leftArrow.on('pointerdown', () => {
-            console.log("left arrow clicked");
             this.goToPreviousPage();
 
         })
         this.rightArrow.on('pointerdown', () => {
-            console.log("rightArrow arrow clicked");
             this.goToNextPage()
 
         })
@@ -98,79 +89,76 @@ export class InfoPopup extends GameObjects.Container {
         this.pages[1].add([symbol1, symbol2, symbol3, symbol4, symbol5, symbol6, symbol7, symbol8]);
         this.add(this.pages[1]);
 
-        this.pages[2] = this.scene.add.container(this.scene.scale.width, 0);  // Position off-screen initially
-        const bonusSymbol = this.scene.add.sprite(200, 300, 'slots8_0')
-        const bonusPageHeading = this.scene.add.text(gameConfig.scale.width * 2, gameConfig.scale.height * 0.5, "Hey this is testing purpose and i am checking that this text is going to be appear or not in second page! let me check it first").setOrigin(0.5)
-        this.pages[2].add([bonusSymbol, bonusPageHeading]);
+        //Page 2
+        this.pages[2] = this.scene.add.container(0, 0);  // Position off-screen initially
+        
+        const bonusPageHeading = this.scene.add.text(gameConfig.scale.width * 0.5, gameConfig.scale.height * 0.2, "WINNING ARE CALCULATED BASED ON BET PER LINE \nBET PER LINE = TOTAL BET / NUMBER OF LINES", {fontFamily: "Poplar", fontSize: 60, color: "#ffffff", align:"center", lineSpacing: 2, resolution: 5}).setOrigin(0.5)
+        const bonusSymbol = this.scene.add.sprite(gameConfig.scale.width * 0.3, gameConfig.scale.height * 0.35, 'slots8_0').setOrigin(0.5).setScale(0.8)
+        const bonusText = this.scene.add.text(gameConfig.scale.width * 0.48, gameConfig.scale.height * 0.35, "Triggers bonus games", {fontFamily: "Poplar", fontSize: 60, color: "#ffffff", align:"center", lineSpacing: 2, resolution: 5}).setOrigin(0.5)
+        const wildSymbol = this.scene.add.sprite(gameConfig.scale.width * 0.3, gameConfig.scale.height * 0.5, "slots9_0").setScale(0.8).setOrigin(0.5)
+        const wildSymbolText = this.scene.add.text(gameConfig.scale.width * 0.55, gameConfig.scale.height * 0.5, "Substitute for all symbols except bonus", {fontFamily: "Poplar", fontSize: 60, color: "#ffffff", lineSpacing: 2, resolution: 5}).setOrigin(0.5)
+        this.pages[2].add([bonusPageHeading, bonusSymbol, bonusText, wildSymbol, wildSymbolText]);
         this.add(this.pages[2]);
 
-        this.pages[3] = this.scene.add.container(this.scene.scale.width * 2, 0);  // Position off-screen initially
-        this.pages[3].add(this.scene.add.sprite(200, 300, 'Page3Sprite'));
+        //Page 3
+        this.pages[3] = this.scene.add.container(0, 0);  // Position off-screen initially
+
+        const page3Heading = this.scene.add.text(gameConfig.scale.width * 0.5, gameConfig.scale.height * 0.17, "DOUBLE GAME", {fontFamily: "Poplar", fontSize: 80, color: "#ffffff", align:"center", lineSpacing: 2, resolution: 5}).setOrigin(0.5)
+        const gambleImage = this.scene.add.sprite(gameConfig.scale.width * 0.28, gameConfig.scale.height * 0.32, "gambleGame").setOrigin(0.5).setScale(0.6)
+        const gambleText = this.scene.add.text(gameConfig.scale.width * 0.6, gameConfig.scale.height * 0.32, `THE PLAYER CAN CLICK "DOUBLE" BITTON AFTER A \nWIN TO ACTIVATE THE RISK GAME. THE PLAYER FACES OF \n AGAINST THE DEALER WITH THE TOTAL OF FOUR CARDS`, {fontFamily:"Poplar", fontSize: 40, color: "#ffffff", align:"center", lineSpacing: 2, resolution: 8}).setOrigin(0.5)
+        const gambleTextPara = this.scene.add.text(gameConfig.scale.width * 0.5, gameConfig.scale.height * 0.5, "THE PLAYER SELECTS ONE OF THE THREE FACE-DOWN CARDS FIRST. THEN THE DEALER REVEALS \nTHEIR CARD. IF THE PLAYER'S CHOOSEN CARD IS HIGHER IN VALUE THAN THE DEALER'S CARD, \nTHE PLAYER'S WINNINGS ARE DOUBLED. IF NOT, THE RECIVES NOTHING.", {fontFamily: "Poplar", fontSize: 40, color: "#ffffff", lineSpacing: 2, resolution: 8}).setOrigin(0.5)
+
+        this.pages[3].add([page3Heading, gambleImage, gambleText, gambleTextPara]);
         this.add(this.pages[3]);
 
-        this.pages = [this.pages[1], this.pages[2], this.pages[3]];
+        //PAGE4
+        this.pages[4] = this.scene.add.container(0, 0);  // Position
+        const page4Heading = this.scene.add.text(gameConfig.scale.width * 0.5, gameConfig.scale.height * 0.17, "BONUS GAME", {fontFamily: "Poplar", fontSize: 80, align:"center", color: "#ffffff", lineSpacing: 2, resolution: 5}).setOrigin(0.5)
+        const bonusImage = this.scene.add.sprite(gameConfig.scale.width * 0.32, gameConfig.scale.height * 0.39, "bonusGame").setOrigin(0.5).setScale(0.6)
+        const bonusTextOne = this.scene.add.text(gameConfig.scale.width * 0.67, gameConfig.scale.height * 0.4, `UNLOCK THE COCONUT SURPRISE BONUS \nGAME BY LANDING 5 BONUS ICONS ON THE \nSLOTS REELS. IN THIS GAME, YOU'LL SEE THE FIVE \n SIMILAR HANGING PLANTS ROPES. SELECT \nONE OF THE ROPES TO REVELA YOUR PRIZE. \n A COCONUT WILL DROP AND BREAK OPEN, \nDISPLAYING THE AMOUNT YOU HAVE WON!`, {fontFamily:"Poplar", fontSize: 40, color: "#ffffff", lineSpacing: 2, resolution: 8}).setOrigin(0.5)
+        this.pages[4].add([page4Heading, bonusImage, bonusTextOne])
+        this.add(this.pages[4])
+
+        this.pages = [this.pages[1], this.pages[2], this.pages[3], this.pages[4]];
+        // Hide all pages initially except the first one
+        this.pages.forEach((page, index) => {
+            page.setVisible(index === 0);
+        });
+
         this.currentPageIndex = 0;
+        this.updateArrowVisibility();
     }
 
     goToNextPage() {
         if (this.currentPageIndex < this.pages.length - 1) {
-            const currentPage = this.pages[this.currentPageIndex];
-            const nextPage = this.pages[this.currentPageIndex + 1];
-            currentPage.setVisible(false);
-            // Animate current page out (move left)
-            // this.scene.tweens.add({
-            //     targets: currentPage,
-            //     x: -this.scene.scale.width,  // Move off-screen to the left
-            //     // duration: 500,
-            //     // ease: 'Power2',
-            //     onComplete: () => {
-            //         currentPage.setVisible(false);
-            //     }
-            // });
-            nextPage.setVisible(true);
-            // Animate next page in (move from right)
-            // this.scene.tweens.add({
-            //     targets: nextPage,
-            //     x: 0,  // Move into view
-            //     duration: 500,
-            //     ease: 'Power2',
-            //     onStart: () => {
-            //         nextPage.setVisible(true);
-            //     }
-            // });
-
+            // Hide current page
+            this.pages[this.currentPageIndex].setVisible(false);
+            
+            // Increment index and show next page
             this.currentPageIndex++;
+            this.pages[this.currentPageIndex].setVisible(true);
+    
+            // Update arrow visibility
+            this.updateArrowVisibility();
         }
     }
-
+    
     goToPreviousPage() {
         if (this.currentPageIndex > 0) {
-            const currentPage = this.pages[this.currentPageIndex];
-            const prevPage = this.pages[this.currentPageIndex - 1];
-            currentPage.setVisible(false);
-            // Animate current page out (move right)
-            // this.scene.tweens.add({
-            //     targets: currentPage,
-            //     x: this.scene.scale.width,  // Move off-screen to the right
-            //     duration: 500,
-            //     ease: 'Power2',
-            //     onComplete: () => {
-            //         currentPage.setVisible(false);
-            //     }
-            // });
-            prevPage.setVisible(true);
-            // // Animate previous page in (move from left)
-            // this.scene.tweens.add({
-            //     targets: prevPage,
-            //     x: 0,  // Move into view
-            //     duration: 500,
-            //     ease: 'Power2',
-            //     onStart: () => {
-            //         prevPage.setVisible(true);
-            //     }
-            // });
-
+            // Hide current page
+            this.pages[this.currentPageIndex].setVisible(false);
+            
+            // Decrement index and show previous page
             this.currentPageIndex--;
+            this.pages[this.currentPageIndex].setVisible(true);
+    
+            // Update arrow visibility
+            this.updateArrowVisibility();
         }
+    }
+    updateArrowVisibility() {
+        // Show/hide arrows based on current page
+        this.leftArrow.setVisible(this.currentPageIndex > 0);
+        this.rightArrow.setVisible(this.currentPageIndex < this.pages.length - 1);
     }
 }

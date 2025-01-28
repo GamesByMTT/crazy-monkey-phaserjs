@@ -528,7 +528,12 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 // Ensure final value is exact
                 this.currentWiningText.updateLabelText(winendValue.toFixed(3).toString());
                 if(winendValue > 0){
-                    this.doubleButton.setInteractive()
+                    currentGameData.gambleState = true
+                    if(currentGameData.gambleState){
+                        this.doubleButton.setInteractive()
+                    }else{
+                        this.doubleButton.disableInteractive()
+                    }
                     this.scene.tweens.add({
                         targets: this.doubleButton,
                         scaleX: { from: 1, to: 1.2 },  // Start from 1, go to 1.2
@@ -591,8 +596,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
     }
 
     hideStopButton(){
-        setTimeout(() => {
+        // setTimeout(() => {
             this.stopButton.setVisible(false)
-        }, 500);
+        // }, 500);
     }
 }

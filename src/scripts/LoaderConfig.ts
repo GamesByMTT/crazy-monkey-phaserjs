@@ -49,6 +49,8 @@ export const LoaderConfig = {
     jackpotPopup: "src/sprites/jackpotPopup.png",
     freeSpinPopup: "src/sprites/FreeSpinPopup.png",
     leftArrow: "src/sprites/leftArrow.png",
+    leftArrowHover: "src/sprites/leftArrowHover.png",
+
     rightArrow: "src/sprites/RightArrow.png",
     settingText: "src/sprites/SettingText.png",
     crossButton: "src/sprites/crossButton.png",
@@ -173,6 +175,8 @@ export const LoaderConfig = {
     BackCard3: "src/sprites/Backcard3.png",
     Double: "src/sprites/withoutName.png",
     collectButton: "src/sprites/CollectButton.png",
+    bonusGame: "src/sprites/bonusGame.png",
+    gambleGame: "src/sprites/gambleGame.png",
 
     SpadesA:"src/sprites/spadeA.png",
     Spades2: "src/sprites/spade2.png",
