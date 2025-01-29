@@ -17,19 +17,25 @@ export class InfoPopup extends GameObjects.Container {
         super(scene);
       
         this.popupBackground = new Phaser.GameObjects.Sprite(this.scene, gameConfig.scale.width / 2, gameConfig.scale.height / 2, "PopupBackground").setScale(0.27);
-        this.leftArrow = new Phaser.GameObjects.Sprite(this.scene, 300, gameConfig.scale.height / 2, "leftArrow").setInteractive();
-        this.rightArrow = new Phaser.GameObjects.Sprite(this.scene, 1600, gameConfig.scale.height / 2, "rightArrow").setInteractive();
+        this.leftArrow = new Phaser.GameObjects.Sprite(this.scene, 250, gameConfig.scale.height / 2, "leftArrow").setInteractive().setScale(1.6);
+        this.rightArrow = new Phaser.GameObjects.Sprite(this.scene, 1670, gameConfig.scale.height / 2, "rightArrow").setInteractive().setScale(1.6);
         this.infoCross = new Phaser.GameObjects.Sprite(this.scene, 1600, gameConfig.scale.height / 2 - 400, "infoCross").setInteractive().setScale(0.2)
         this.infoCross.on('pointerdown', () => {
             this.scene.events.emit("closePopup")
         });
         this.leftArrow.on('pointerdown', () => {
+            this.leftArrow.setTexture("leftArrowHover").setScale(1.6)
             this.goToPreviousPage();
-
+        })
+        this.leftArrow.on("pointerup", ()=>{
+            this.leftArrow.setTexture("leftArrow").setScale(1.6)
         })
         this.rightArrow.on('pointerdown', () => {
+            this.rightArrow.setTexture("rightArrowHover").setScale(1.6)
             this.goToNextPage()
-
+        })
+        this.rightArrow.on("pointerup", ()=>{
+            this.rightArrow.setTexture("rightArrow").setScale(1.6)
         })
         this.add([this.popupBackground, this.leftArrow, this.rightArrow, this.infoCross])
         this.pages = []
@@ -126,7 +132,7 @@ export class InfoPopup extends GameObjects.Container {
         });
 
         this.currentPageIndex = 0;
-        this.updateArrowVisibility();
+        // this.updateArrowVisibility();
     }
 
     goToNextPage() {
@@ -139,7 +145,7 @@ export class InfoPopup extends GameObjects.Container {
             this.pages[this.currentPageIndex].setVisible(true);
     
             // Update arrow visibility
-            this.updateArrowVisibility();
+            // this.updateArrowVisibility();
         }
     }
     
@@ -153,7 +159,7 @@ export class InfoPopup extends GameObjects.Container {
             this.pages[this.currentPageIndex].setVisible(true);
     
             // Update arrow visibility
-            this.updateArrowVisibility();
+            // this.updateArrowVisibility();
         }
     }
     updateArrowVisibility() {

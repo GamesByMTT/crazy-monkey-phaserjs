@@ -52,6 +52,7 @@ export const LoaderConfig = {
     leftArrowHover: "src/sprites/leftArrowHover.png",
 
     rightArrow: "src/sprites/RightArrow.png",
+    rightArrowHover: "src/sprites/rightArrowHover.png",
     settingText: "src/sprites/SettingText.png",
     crossButton: "src/sprites/crossButton.png",
     crossButtonHover: "src/sprites/crossButtonHover.png",
