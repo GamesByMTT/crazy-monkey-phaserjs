@@ -3,7 +3,7 @@ import { GamblePopup } from "./Popups/GamblePopup";
 import { LogoutPopup } from "./Popups/LogoutPopup";
 import { SettingPopup } from "./Popups/SettingPopup";
 import { InfoPopup } from "./Popups/InfoPopup";
-import { DisconnectionPopup } from "./Popups/disconnection";
+import { DisconnectionPopup } from "./Popups/Disconnection";
 import { BonusPopup } from "./Popups/BonusPopup";
 
 export class Popupmanager{
